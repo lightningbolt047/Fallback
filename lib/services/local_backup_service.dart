@@ -16,7 +16,6 @@ class LocalBackupService{
       File file=File(path.join(directoryPath,"Fallback-backup-${DateTime.now().millisecondsSinceEpoch}.fbcrypt"));
       await file.writeAsString(encrypted);
     }catch(e){
-      print(e);
       return Future.error(e);
     }
   }
