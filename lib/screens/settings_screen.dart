@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:fallback/const.dart';
+import 'package:fallback/services/local_backup_service.dart';
+import 'package:fallback/services/permissions.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
@@ -9,6 +13,7 @@ import 'package:fallback/widgets_basic/page_subheading.dart';
 import 'package:fallback/widgets_basic/preference_toggle.dart';
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets_basic/material_you/tappable_list_tile.dart';
@@ -30,6 +35,8 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
   late AnimationController _animationController;
   late Animation<double> _animation;
 
+  late final LocalBackupService _localBackupService;
+
   String _password="";
   String _confirmPassword="";
   String _oldPassword="";
@@ -37,6 +44,8 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
 
   @override
   void initState() {
+
+    _localBackupService=LocalBackupService(secureStorage);
 
     _animationController=AnimationController(
       vsync: this,
@@ -210,7 +219,167 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   titleText: "Export Backup",
                   subtitleText: "Keys are encrypted using your password and saved on your local storage",
                   leading: const Icon(Icons.backup_table_rounded, color: kIconColor,),
-                  onTap: (){},
+                  onTap: (){
+                    showDialog(
+                      context: context,
+                      builder: (context)=>FutureBuilder(
+                        future: secureStorage.readEncryptionPassword(),
+                        builder: (BuildContext context, AsyncSnapshot<String?> snapshot){
+                          if(!snapshot.hasData && snapshot.connectionState==ConnectionState.waiting){
+                            return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kBackgroundColor,),);
+                          }
+                          if(snapshot.data==null){
+                            return CustomAlertDialog(
+                              title: const Text("Encryption password not set",style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),),
+                              backgroundColor: kBackgroundColor,
+                              content: const Text("The password is used to encrypt the data before exporting it as a backup. Please set a password before proceeding"),
+                              actions: [
+                                CustomMaterialButton(
+                                  child: const Text("OK",style: TextStyle(
+                                    color: kBackgroundColor
+                                  ),),
+                                  buttonColor: kIconColor,
+                                  onPressed: (){
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            );
+                          }
+                          return FutureBuilder(
+                            future: Permissions.getStoragePermissions(),
+                            builder: (BuildContext context,AsyncSnapshot<bool> snapshot) {
+
+                              if(!snapshot.hasData){
+                                return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kBackgroundColor,),);
+                              }
+                              if(!snapshot.data!){
+                                return CustomAlertDialog(
+                                  title: const Text("Failed to export backup",style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),),
+                                  backgroundColor: kBackgroundColor,
+                                  content: const Text("Required permissions were not granted"),
+                                  actions: [
+                                    CustomMaterialButton(
+                                      child: const Text("OK",style: TextStyle(
+                                        color: kBackgroundColor,
+                                      ),),
+                                      buttonColor: kIconColor,
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }
+
+
+                              return FutureBuilder(
+                                future: FilePicker.platform.getDirectoryPath(dialogTitle: "Choose where to save backup"),
+                                builder: (BuildContext context,AsyncSnapshot<String?> snapshot){
+                                  if(!snapshot.hasData && snapshot.connectionState==ConnectionState.waiting){
+                                    return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kBackgroundColor,),);
+                                  }
+                                  if(snapshot.data==null){
+                                    return CustomAlertDialog(
+                                      title: const Text("Failed to export backup",style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),),
+                                      backgroundColor: kBackgroundColor,
+                                      content: const Text("Directory to save was not selected"),
+                                      actions: [
+                                        CustomMaterialButton(
+                                          child: const Text("OK",style: TextStyle(
+                                            color: kBackgroundColor,
+                                          ),),
+                                          buttonColor: kIconColor,
+                                          onPressed: (){
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                  return FutureBuilder(
+                                    future: _localBackupService.backupAllKeys(snapshot.data!),
+                                    builder: (BuildContext context,AsyncSnapshot<void> backupStatusSnapshot){
+                                      if(!backupStatusSnapshot.hasData && backupStatusSnapshot.connectionState==ConnectionState.waiting){
+                                        return CustomAlertDialog(
+                                          title: const Text("Encrypting and Exporting backup",style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),),
+                                          backgroundColor: kBackgroundColor,
+                                          content: Row(
+                                            children: const [
+                                              CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: kIconColor,
+                                              ),
+                                              SizedBox(
+                                                width: 8,
+                                              ),
+                                              Text("Exporting Backup")
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      if(backupStatusSnapshot.hasError){
+                                        return CustomAlertDialog(
+                                          title: const Text("Failed to export backup",style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),),
+                                          backgroundColor: kBackgroundColor,
+                                          content: const Text("Something went wrong while exporting the backup"),
+                                          actions: [
+                                            CustomMaterialButton(
+                                              child: const Text("OK",style: TextStyle(
+                                                color: kBackgroundColor,
+                                              ),),
+                                              buttonColor: kIconColor,
+                                              onPressed: (){
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                      return CustomAlertDialog(
+                                        title: const Text("Backup exported successfully",style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                        ),),
+                                        backgroundColor: kBackgroundColor,
+                                        content: Text("Backup is stored in: ${snapshot.data!}"),
+                                        actions: [
+                                          CustomMaterialButton(
+                                            child: const Text("OK",style: TextStyle(
+                                              color: kBackgroundColor,
+                                            ),),
+                                            buttonColor: kIconColor,
+                                            onPressed: (){
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                          );
+                        },
+                      )
+                    );
+                  },
                 ),
               ),
               SliverToBoxAdapter(

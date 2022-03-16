@@ -39,6 +39,9 @@ dependencies:
   animations: ^2.0.2
   shared_preferences: ^2.0.13
   biometric_storage: ^4.0.1
+  file_picker: ^4.5.1
+  aes256gcm: ^1.0.1
+  permission_handler: ^9.2.0
 
 dev_dependencies:
   flutter_test:

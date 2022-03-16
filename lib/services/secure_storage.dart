@@ -30,7 +30,7 @@ class SecureStorage{
 
     try{
       _storage=await _keyStore.read();
-      _storage ??= jsonEncode({'keys':{'businesses':[]}});
+      _storage ??= jsonEncode({'keys':{'businesses':[],'lastModified':0}});
       return jsonDecode(_storage!);
     }on AuthException{
       return await readFullFile();

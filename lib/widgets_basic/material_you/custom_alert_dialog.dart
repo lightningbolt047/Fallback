@@ -6,7 +6,7 @@ class CustomAlertDialog extends StatelessWidget {
   final Widget content;
   final List<Widget> actions;
   final Color? backgroundColor;
-  const CustomAlertDialog({Key? key,required this.title,required this.content, required this.actions,this.backgroundColor}) : super(key: key);
+  const CustomAlertDialog({Key? key,required this.title,required this.content, this.actions=const [],this.backgroundColor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
