@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
    <application
-        android:requestLegacyExternalStorage="true"
+        android:hasFragileUserData="true"
         android:label="fallback"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
