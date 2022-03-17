@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fallback/const.dart';
+import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/local_backup_service.dart';
 import 'package:fallback/services/permissions.dart';
 import 'package:fallback/services/secure_storage.dart';
@@ -15,23 +16,26 @@ import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:fallback/config.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets_basic/material_you/tappable_list_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
   final SecureStorage secureStorage;
-  const SettingsScreen({Key? key,required this.secureStorage}) : super(key: key);
+  final FirebaseServices firebaseServices;
+  const SettingsScreen({Key? key,required this.secureStorage,required this.firebaseServices}) : super(key: key);
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState(secureStorage);
+  State<SettingsScreen> createState() => _SettingsScreenState(secureStorage,firebaseServices);
 }
 
 class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
 
   final SecureStorage secureStorage;
+  final FirebaseServices firebaseServices;
 
-  _SettingsScreenState(this.secureStorage);
+  _SettingsScreenState(this.secureStorage,this.firebaseServices);
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -87,6 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
               SliverToBoxAdapter(
                 child: PreferenceToggle(
                   onChanged: (value) async{
+                    if(value){
+                      await firebaseServices.signInWithGoogle();
+                    }else{
+                      await firebaseServices.signOutOfGoogle();
+                    }
                     await setEnableCloudSyncPreference(value);
                     setState(() {});
                   },

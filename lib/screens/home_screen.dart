@@ -1,6 +1,8 @@
 import 'package:fallback/const.dart';
+import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/greeting_service.dart';
 import 'package:fallback/services/secure_storage.dart';
+import 'package:fallback/services/stirng_services.dart';
 import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
@@ -18,18 +20,20 @@ import 'package:biometric_storage/biometric_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   final SecureStorage secureStorage;
-  const HomeScreen({Key? key,required this.secureStorage}) : super(key: key);
+  final FirebaseServices firebaseServices;
+  const HomeScreen({Key? key,required this.secureStorage,required this.firebaseServices}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState(secureStorage);
+  State<HomeScreen> createState() => _HomeScreenState(secureStorage,firebaseServices);
 }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
 
 
   final SecureStorage secureStorage;
+  final FirebaseServices firebaseServices;
 
-  _HomeScreenState(this.secureStorage);
+  _HomeScreenState(this.secureStorage,this.firebaseServices);
 
 
   late AnimationController _animationController;
@@ -65,6 +69,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.initState();
 
     _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+
+    _animationController.dispose();
+    super.dispose();
   }
 
 
@@ -126,34 +137,31 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ],
               backgroundColor: Colors.transparent,
             ),
-            SliverAnimatedList(
-              initialItemCount: 1,
-              itemBuilder: (BuildContext context,int index, Animation<double> animation){
-                return Card(
-                  color: kAttentionItemColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  margin: const EdgeInsets.only(top: 20),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
-                        Text("Syncing with Cloud",style: GoogleFonts.quicksand(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20
-                        ),),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
             // SliverToBoxAdapter(
             //   child: ,
             // ),
+            SliverToBoxAdapter(
+              child: Card(
+                color: kAttentionItemColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                margin: const EdgeInsets.only(top: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
+                      Text("Syncing with Cloud",style: GoogleFonts.quicksand(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20
+                      ),),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             FutureBuilder(
               future: keys,
               builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {

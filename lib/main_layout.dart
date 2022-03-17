@@ -3,17 +3,13 @@ import 'package:biometric_storage/biometric_storage.dart';
 import 'package:fallback/screens/add_code_screen.dart';
 import 'package:fallback/screens/home_screen.dart';
 import 'package:fallback/screens/settings_screen.dart';
-import 'package:fallback/services/greeting_service.dart';
+import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
-import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/material_you/custom_alert_dialog.dart';
-import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'enums.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'const.dart';
 
 class MainLayout extends StatefulWidget {
@@ -155,18 +151,50 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
         ),
       ),
       body: FutureBuilder(
-        future: _secureStorage,
-        builder: (BuildContext context,AsyncSnapshot<SecureStorage> snapshot){
-          if(!snapshot.hasData){
+        future: Firebase.initializeApp(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+
+          if(snapshot.hasError){
+            showDialog(
+              context: context,
+              builder: (context)=>const CustomAlertDialog(
+                backgroundColor: kBackgroundColor,
+                title: Text("Error",style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600
+                ),),
+                content: Text("Something went wrong! Probably couldn't find google play on your device"),
+              ),
+            );
             return const Center(
               child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),
             );
           }
-          if(_selectedScreen==Screen.settings){
-            return SettingsScreen(secureStorage: snapshot.data!,);
+
+          if(snapshot.connectionState==ConnectionState.waiting){
+            return const Center(
+              child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),
+            );
           }
-          return HomeScreen(secureStorage: snapshot.data!,);
-        },
+
+          return FutureBuilder(
+            future: _secureStorage,
+            builder: (BuildContext context,AsyncSnapshot<SecureStorage> snapshot){
+              if(!snapshot.hasData){
+                return const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),
+                );
+              }
+
+              final FirebaseServices firebaseServices=FirebaseServices(snapshot.data!);
+
+              if(_selectedScreen==Screen.settings){
+                return SettingsScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices,);
+              }
+              return HomeScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices);
+            },
+          );
+        }
       ),
     );
   }
