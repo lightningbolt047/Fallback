@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:fallback/const.dart';
 import 'package:fallback/services/encryptionService.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/services/stirng_services.dart';
+import 'package:fallback/services/string_services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -52,7 +52,6 @@ class FirebaseServices{
 
   Future<void> createCloudBackup() async{
     // DocumentSnapshot document=await _databaseInstance.collection('userData').doc(await _secureStorage.readUserID()).get();
-    print((await _databaseInstance.collection('userData').get()));
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
     String? userID=await _secureStorage.readUserID();
     if(encryptionPassword==null || userID==null){

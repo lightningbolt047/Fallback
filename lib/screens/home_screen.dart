@@ -2,7 +2,7 @@ import 'package:fallback/const.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/greeting_service.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/services/stirng_services.dart';
+import 'package:fallback/services/string_services.dart';
 import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
@@ -73,7 +73,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-
     _animationController.dispose();
     super.dispose();
   }
