@@ -126,28 +126,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ],
               backgroundColor: Colors.transparent,
             ),
-            SliverToBoxAdapter(
-              child: Card(
-                color: kAttentionItemColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                margin: const EdgeInsets.only(top: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
-                      Text("Syncing with Cloud",style: GoogleFonts.quicksand(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20
-                      ),),
-                    ],
+            SliverAnimatedList(
+              initialItemCount: 1,
+              itemBuilder: (BuildContext context,int index, Animation<double> animation){
+                return Card(
+                  color: kAttentionItemColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ),
-              ),
+                  margin: const EdgeInsets.only(top: 20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
+                        Text("Syncing with Cloud",style: GoogleFonts.quicksand(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20
+                        ),),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
+            // SliverToBoxAdapter(
+            //   child: ,
+            // ),
             FutureBuilder(
               future: keys,
               builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
