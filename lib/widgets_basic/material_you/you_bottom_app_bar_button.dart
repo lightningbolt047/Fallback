@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-
 import '../../const.dart';
 
-class BottomAppBarButton extends StatelessWidget {
+class YouBottomAppBarButton extends StatelessWidget {
 
   final IconData iconData;
-  // final Widget selectedIcon;
   final String text;
-  // final Color selectedTextColor;
   final bool isSelected;
   final VoidCallback onPressed;
 
-  const BottomAppBarButton({Key? key,required this.iconData, required this.text, this.isSelected=false, required this.onPressed}) : super(key: key);
+  const YouBottomAppBarButton({Key? key,required this.iconData, required this.text, this.isSelected=false, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

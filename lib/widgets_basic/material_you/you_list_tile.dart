@@ -1,8 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-
-import '../../const.dart';
 
 class YouListTile extends StatelessWidget {
 

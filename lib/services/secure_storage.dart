@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:biometric_storage/biometric_storage.dart';
-import 'package:flutter/foundation.dart';
 
 class SecureStorage{
 

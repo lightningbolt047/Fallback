@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import '../../const.dart';
-import '../../services/asset_mapping.dart';
 
 
 class CustomTextField extends StatelessWidget {
@@ -45,8 +42,8 @@ class CustomTextField extends StatelessWidget {
       textInputAction: TextInputAction.next,
       cursorHeight: 25,
       cursorColor: kIconColor,
-      style: GoogleFonts.quicksand(
-          fontSize: 20
+      style: const TextStyle(
+        fontSize: 20
       ),
     );
   }

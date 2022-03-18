@@ -1,17 +1,13 @@
-import 'dart:io';
-
 import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
-import 'package:fallback/widgets_basic/buttons/simple_rounded_button.dart';
 import 'package:fallback/widgets_basic/compound/counter_toggle.dart';
 import 'package:fallback/widgets_basic/input_widgets/code_segment_input.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/asset_mapping.dart';
 import '../widgets_basic/input_widgets/custom_text_field.dart';
 
@@ -202,7 +198,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Rows",style: GoogleFonts.quicksand(
+                      const Text("Rows",style: TextStyle(
                         fontSize: 20
                       ),),
                       CounterToggle(
@@ -227,7 +223,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Columns",style: GoogleFonts.quicksand(
+                      const Text("Columns",style: TextStyle(
                           fontSize: 20
                       ),),
                       CounterToggle(

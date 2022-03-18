@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:fallback/const.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CodeSegmentInput extends StatelessWidget {
   final Function onChanged;
@@ -44,7 +41,7 @@ class CodeSegmentInput extends StatelessWidget {
             fillColor: kCodeBackgroundColor,
             filled: true,
           ),
-          style: GoogleFonts.quicksand(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 20,
           ),

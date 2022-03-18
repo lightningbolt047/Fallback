@@ -5,7 +5,7 @@ import 'package:fallback/screens/home_screen.dart';
 import 'package:fallback/screens/settings_screen.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
+import 'package:fallback/widgets_basic/material_you/you_bottom_app_bar_button.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +94,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              BottomAppBarButton(
+              YouBottomAppBarButton(
                 iconData: Icons.home,
                 text: "Home",
                 isSelected: _selectedScreen==Screen.home,
@@ -104,7 +104,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
                   });
                 },
               ),
-              BottomAppBarButton(
+              YouBottomAppBarButton(
                 iconData: Icons.settings,
                 text: "Settings",
                 isSelected: _selectedScreen==Screen.settings,

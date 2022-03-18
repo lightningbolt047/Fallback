@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:aes256gcm/aes256gcm.dart';
 import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:path/path.dart' as path;

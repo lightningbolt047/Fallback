@@ -5,7 +5,6 @@ import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fallback/services/asset_mapping.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../const.dart';
 import 'code_segment.dart';
 import 'material_you/you_alert_dialog.dart';
@@ -94,7 +93,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(businessName,style: GoogleFonts.quicksand(
+                      Text(businessName,style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w400
                       ),),
@@ -102,7 +101,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                         constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width*0.6,
                         ),
-                        child: Text(nickname,maxLines: 1,overflow: TextOverflow.ellipsis,style: GoogleFonts.quicksand(),),
+                        child: Text(nickname,maxLines: 1,overflow: TextOverflow.ellipsis,),
                       ),
                     ],
                   ),
@@ -238,7 +237,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                                     ),
                                   ),
                                   CustomMaterialButton(
-                                    child: Text("OK",style: GoogleFonts.quicksand(color: kBackgroundColor),),
+                                    child: const Text("OK",style: TextStyle(color: kBackgroundColor),),
                                     buttonColor: kIconColor,
                                     onPressed: () async{
                                       ScaffoldMessenger.of(context).clearSnackBars();

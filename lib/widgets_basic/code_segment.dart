@@ -1,6 +1,5 @@
 import 'package:fallback/const.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 
 class CodeSegment extends StatelessWidget {
@@ -23,7 +22,7 @@ class CodeSegment extends StatelessWidget {
           Clipboard.setData(ClipboardData(text: codeSegment));
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied \"$codeSegment\" to clipboard")));
         },
-        child: Text(codeSegment,style: GoogleFonts.quicksand(
+        child: Text(codeSegment,style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 20
         ),),

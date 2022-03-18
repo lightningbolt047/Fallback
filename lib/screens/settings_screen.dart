@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:fallback/const.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/local_backup_service.dart';
-import 'package:fallback/services/permissions.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
@@ -11,12 +9,8 @@ import 'package:fallback/widgets_basic/input_widgets/custom_text_field.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:fallback/widgets_basic/page_subheading.dart';
 import 'package:fallback/widgets_basic/preference_toggle.dart';
-import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:fallback/config.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import '../widgets_basic/material_you/you_list_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -119,7 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                           }
 
                           return YouAlertDialog(
-                            title: Text("Set Password",style: GoogleFonts.quicksand(
+                            title: const Text("Set Password",style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                             ),),

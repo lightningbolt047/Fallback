@@ -2,20 +2,13 @@ import 'package:fallback/const.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/greeting_service.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/services/string_services.dart';
 import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
-import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
-import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:animations/animations.dart';
 
 import '../widgets_basic/buttons/custom_material_button.dart';
 import '../widgets_basic/custom_app_bar.dart';
-import 'add_code_screen.dart';
-import 'package:biometric_storage/biometric_storage.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -103,11 +96,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       showDialog(
                         context: context,
                         builder: (context)=>YouAlertDialog(
-                          title: Text("Force Stop?",style: GoogleFonts.quicksand(
+                          title: const Text("Force Stop?",style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600
                           ),),
-                          content: Text("If you force stop an app, it may misbehave",style: GoogleFonts.quicksand(),),
+                          content: const Text("If you force stop an app, it may misbehave",),
                           backgroundColor: kBackgroundColor,
                           actions: [
                             OutlinedButton(
@@ -151,9 +144,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
-                      Text("Syncing with Cloud",style: GoogleFonts.quicksand(
+                    children: const [
+                      CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
+                      Text("Syncing with Cloud",style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 20
                       ),),

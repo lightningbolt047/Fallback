@@ -3,7 +3,6 @@ import 'package:fallback/enums.dart';
 import 'package:fallback/widgets_basic/buttons/simple_rounded_button.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CounterToggle extends StatelessWidget {
   final int value;
@@ -20,7 +19,7 @@ class CounterToggle extends StatelessWidget {
             onTogglePress(CounterAction.subtract);
           },
         ),
-        Text(value.toString(),style: GoogleFonts.quicksand(),),
+        Text(value.toString(),),
         SimpleRoundedButton(
           child: const Icon(FontAwesomeIcons.plus, color: kBackgroundColor,),
           onPressed: (){

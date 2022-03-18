@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ScreenHeaderText extends StatelessWidget {
   final String text;
@@ -7,7 +6,7 @@ class ScreenHeaderText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,style: GoogleFonts.quicksand(
+    return Text(text,style: const TextStyle(
         fontSize: 30,
         fontWeight: FontWeight.w400
     ),);

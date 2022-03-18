@@ -1,6 +1,5 @@
 import 'package:fallback/const.dart';
 import 'package:fallback/main_layout.dart';
-import 'package:fallback/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

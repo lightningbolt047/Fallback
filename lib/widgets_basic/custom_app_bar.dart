@@ -1,11 +1,5 @@
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-import '../const.dart';
-import '../services/greeting_service.dart';
-import 'buttons/custom_material_button.dart';
-import 'material_you/you_alert_dialog.dart';
 
 
 class CustomSliverAppBar extends StatelessWidget {
