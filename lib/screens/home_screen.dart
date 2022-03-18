@@ -44,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void fetchKeys() async{
     keys=secureStorage.readKeys();
     await keys;
-    firebaseServices.restoreCloudBackup();
     setState(() {});
   }
 
