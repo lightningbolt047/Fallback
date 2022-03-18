@@ -8,7 +8,7 @@ import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/buttons/simple_rounded_button.dart';
 import 'package:fallback/widgets_basic/compound/counter_toggle.dart';
 import 'package:fallback/widgets_basic/input_widgets/code_segment_input.dart';
-import 'package:fallback/widgets_basic/material_you/custom_alert_dialog.dart';
+import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -128,7 +128,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                 }catch(e){
                   showDialog(
                     context: context,
-                    builder: (context)=>CustomAlertDialog(
+                    builder: (context)=>YouAlertDialog(
                       backgroundColor: kBackgroundColor,
                       title: const Text("Error",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
                       content: const Text("An error occurred while storing the information"),

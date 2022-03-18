@@ -95,6 +95,13 @@ class SecureStorage{
   Future<void> addKey(Map<String,dynamic> key) async{
     Map<String,dynamic> cacheDecoded=await readFullFile();
     cacheDecoded['keys']['businesses'].add(key);
+    cacheDecoded['keys']['lastModified']=key['lastModified'];
+    await writeFullFile(cacheDecoded);
+  }
+
+  Future<void> setAllKeys(Map<String,dynamic> keys) async{
+    Map<String,dynamic> cacheDecoded=await readFullFile();
+    cacheDecoded['keys']=keys;
     await writeFullFile(cacheDecoded);
   }
 
@@ -107,6 +114,7 @@ class SecureStorage{
         break;
       }
     }
+    cacheDecoded['keys']['lastModified']=DateTime.now().millisecondsSinceEpoch;
     await writeFullFile(cacheDecoded);
   }
 

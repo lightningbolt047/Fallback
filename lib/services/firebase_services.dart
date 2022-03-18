@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:fallback/const.dart';
-import 'package:fallback/services/encryptionService.dart';
+import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/string_services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -57,13 +57,33 @@ class FirebaseServices{
     if(encryptionPassword==null || userID==null){
       return;
     }
+    Map<String,dynamic> keys=await _secureStorage.readKeys();
+    String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
-    String keysEncrypted=await EncryptionService.encryptString(jsonEncode(await _secureStorage.readKeys()), (await _secureStorage.readEncryptionPassword())!);
-
-    await _databaseInstance.collection('userData').doc(await _secureStorage.readUserID()).set({
+    await _databaseInstance.collection('userData').doc(userID).set({
       "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
-      "lastModified": DateTime.now().millisecondsSinceEpoch
+      "lastModified": keys['lastModified'],
     });
+  }
+
+  Future<void> restoreCloudBackup() async{
+    String? encryptionPassword=await _secureStorage.readEncryptionPassword();
+    String? userID=await _secureStorage.readUserID();
+
+    if(encryptionPassword==null || userID==null){
+      return;
+    }
+
+    DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+
+    Map<String,dynamic> document=documentSnapshot.data() as Map<String,dynamic>;
+    List<String> keyList=[];
+    for(int i=0;i<document['keys'].length;i++){
+      keyList.add(document['keys'][i] as String);
+    }
+    String decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
+    print(jsonDecode(decryptedKeysString));
+    _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
 
   }
 

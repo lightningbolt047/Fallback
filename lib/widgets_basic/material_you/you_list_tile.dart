@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../const.dart';
 
-class TappableListTile extends StatelessWidget {
+class YouListTile extends StatelessWidget {
 
   final String titleText;
   final String subtitleText;
@@ -14,7 +14,7 @@ class TappableListTile extends StatelessWidget {
   final bool enabled;
   final bool leaveBottomSpace;
 
-  const TappableListTile({Key? key, required this.titleText, required this.subtitleText, this.leading, this.trailing, this.leaveBottomSpace=true, this.onTap, this.enabled=true}) : super(key: key);
+  const YouListTile({Key? key, required this.titleText, required this.subtitleText, this.leading, this.trailing, this.leaveBottomSpace=true, this.onTap, this.enabled=true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

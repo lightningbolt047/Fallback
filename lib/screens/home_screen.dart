@@ -6,7 +6,7 @@ import 'package:fallback/services/string_services.dart';
 import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
-import 'package:fallback/widgets_basic/material_you/custom_alert_dialog.dart';
+import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void fetchKeys() async{
     keys=secureStorage.readKeys();
     await keys;
+    firebaseServices.restoreCloudBackup();
     setState(() {});
   }
 
@@ -56,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     homeScreenTrigger.addListener(() {
       fetchKeys();
     });
+
     _animationController=AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250)
@@ -101,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     onPressed: (){
                       showDialog(
                         context: context,
-                        builder: (context)=>CustomAlertDialog(
+                        builder: (context)=>YouAlertDialog(
                           title: Text("Force Stop?",style: GoogleFonts.quicksand(
                               fontSize: 20,
                               fontWeight: FontWeight.w600

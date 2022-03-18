@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../const.dart';
 import 'code_segment.dart';
-import 'material_you/custom_alert_dialog.dart';
+import 'material_you/you_alert_dialog.dart';
 
 class BackupCodeCard extends StatefulWidget {
   final String businessName;
@@ -218,7 +218,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                           onPressed: (){
                             showDialog(
                               context: context,
-                              builder: (context)=>CustomAlertDialog(
+                              builder: (context)=>YouAlertDialog(
                                 title: const Text("Are you sure?",style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600

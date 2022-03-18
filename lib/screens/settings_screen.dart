@@ -8,7 +8,7 @@ import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/custom_app_bar.dart';
 import 'package:fallback/widgets_basic/input_widgets/custom_text_field.dart';
-import 'package:fallback/widgets_basic/material_you/custom_alert_dialog.dart';
+import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:fallback/widgets_basic/page_subheading.dart';
 import 'package:fallback/widgets_basic/preference_toggle.dart';
 import 'package:fallback/widgets_basic/text_widgets/screen_header_text.dart';
@@ -17,7 +17,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../widgets_basic/material_you/tappable_list_tile.dart';
+import '../widgets_basic/material_you/you_list_tile.dart';
 
 class SettingsScreen extends StatefulWidget {
   final SecureStorage secureStorage;
@@ -99,11 +99,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   },
                   getPreference: getEnableCloudSyncPreference,
                   titleText: "Enable Cloud Sync",
-                  subtitleText: "Cloud sync enables you to backup your keys safely to the cloud and lets you access the keys across devices",
+                  subtitleText: "Cloud sync backs up your keys safely to the cloud and allows access to your keys across devices",
                 ),
               ),
               SliverToBoxAdapter(
-                child: TappableListTile(
+                child: YouListTile(
                   titleText: "Set Encryption Password",
                   subtitleText: "This password is used to encrypt your keys before syncing to the cloud or exporting a backup",
                   leading: const Icon(Icons.key,color: kIconColor,),
@@ -118,7 +118,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                             return const Center(child: CircularProgressIndicator(strokeWidth: 2, color: kBackgroundColor,));
                           }
 
-                          return CustomAlertDialog(
+                          return YouAlertDialog(
                             title: Text("Set Password",style: GoogleFonts.quicksand(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -224,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   child: PageSubheading(subheadingName: "Backup and Restore"),
                 ),
                 SliverToBoxAdapter(
-                  child: TappableListTile(
+                  child: YouListTile(
                     titleText: "Export Backup",
                     subtitleText: "Keys are encrypted using your password and saved on your local storage",
                     leading: const Icon(Icons.backup_table_rounded, color: kIconColor,),
@@ -239,7 +239,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                               return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kBackgroundColor,),);
                             }
                             if(snapshot.data==null){
-                              return CustomAlertDialog(
+                              return YouAlertDialog(
                                 title: const Text("Encryption password not set",style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
@@ -263,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                               future: _localBackupService.backupAllKeys(),
                               builder: (BuildContext context,AsyncSnapshot<String> backupStatusSnapshot){
                                 if(!backupStatusSnapshot.hasData && backupStatusSnapshot.connectionState==ConnectionState.waiting){
-                                  return CustomAlertDialog(
+                                  return YouAlertDialog(
                                     title: const Text("Encrypting and Exporting backup",style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
@@ -284,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                                   );
                                 }
                                 if(backupStatusSnapshot.hasError){
-                                  return CustomAlertDialog(
+                                  return YouAlertDialog(
                                     title: const Text("Failed to export backup",style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
@@ -304,7 +304,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                                     ],
                                   );
                                 }
-                                return CustomAlertDialog(
+                                return YouAlertDialog(
                                   title: const Text("Backup exported successfully",style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
@@ -344,7 +344,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: TappableListTile(
+                  child: YouListTile(
                     titleText: "Restore Backup",
                     subtitleText: "Import encrypted backups using the password used to encrypt the backup",
                     leading: const Icon(Icons.restore_rounded, color: kIconColor,),
@@ -352,10 +352,10 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: TappableListTile(
+                  child: YouListTile(
                     titleText: "Clear all Backup Files",
                     subtitleText: "This will delete all stored backups in the backup directory. Backups you have stored separately will still work",
-                    leading: const Icon(Icons.delete_forever_rounded, color: kIconColor,),
+                    leading: const Icon(Icons.delete_forever_rounded, color: Colors.red,),
                     onTap: (){
                       showDialog(
                         context: context,
@@ -365,7 +365,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                             if(snapshot.connectionState==ConnectionState.waiting){
                               return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kBackgroundColor,),);
                             }
-                            return CustomAlertDialog(
+                            return YouAlertDialog(
                               title: const Text("Deleted all stored backups", style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,

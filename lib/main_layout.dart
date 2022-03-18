@@ -6,7 +6,7 @@ import 'package:fallback/screens/settings_screen.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/widgets_basic/buttons/bottomAppBarButton.dart';
-import 'package:fallback/widgets_basic/material_you/custom_alert_dialog.dart';
+import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'enums.dart';
@@ -38,7 +38,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
       barrierDismissible: false,
       builder: (context)=>WillPopScope(
         onWillPop: ()async=>false,
-        child: CustomAlertDialog(
+        child: YouAlertDialog(
           title: Builder(
             builder: (context){
               String titleText="Fail";
@@ -157,7 +157,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
           if(snapshot.hasError){
             showDialog(
               context: context,
-              builder: (context)=>const CustomAlertDialog(
+              builder: (context)=>const YouAlertDialog(
                 backgroundColor: kBackgroundColor,
                 title: Text("Error",style: TextStyle(
                   fontSize: 20,

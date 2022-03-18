@@ -1,12 +1,12 @@
 import 'package:fallback/const.dart';
 import 'package:flutter/material.dart';
 
-class CustomAlertDialog extends StatelessWidget {
+class YouAlertDialog extends StatelessWidget {
   final Widget title;
   final Widget content;
   final List<Widget> actions;
   final Color? backgroundColor;
-  const CustomAlertDialog({Key? key,required this.title,required this.content, this.actions=const [],this.backgroundColor}) : super(key: key);
+  const YouAlertDialog({Key? key,required this.title,required this.content, this.actions=const [],this.backgroundColor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

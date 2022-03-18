@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:aes256gcm/aes256gcm.dart';
+import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
@@ -14,7 +15,7 @@ class LocalBackupService{
       String directoryPath=(await getExternalStorageDirectory())!.path;
       Map<String,dynamic> keys=await secureStorage.readKeys();
       String keysEncoded=jsonEncode(keys);
-      String encrypted=await Aes256Gcm.encrypt(keysEncoded, (await secureStorage.readEncryptionPassword())!);
+      String encrypted=await EncryptionService.encryptString(keysEncoded, (await secureStorage.readEncryptionPassword())!);
       String fullFilePath=path.join(directoryPath,"Fallback-backup-${DateTime.now().millisecondsSinceEpoch}.fbcrypt");
       File file=File(fullFilePath);
       await file.writeAsString(encrypted);

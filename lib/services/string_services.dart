@@ -17,4 +17,8 @@ class StringServices{
     return splitString;
   }
 
+  static String joinStringFromList(List<String> stringList){
+    return stringList.join();
+  }
+
 }
