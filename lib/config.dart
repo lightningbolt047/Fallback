@@ -1,1 +1,1 @@
-const bool enableLocalBackups=false;
+const bool enableLocalBackups=true;
