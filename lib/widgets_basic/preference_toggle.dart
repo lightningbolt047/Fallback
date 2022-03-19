@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'material_you/you_switch_list_tile.dart';
+
 
 class PreferenceToggle extends StatefulWidget {
 
@@ -25,28 +27,36 @@ class _PreferenceToggleState extends State<PreferenceToggle> {
 
   _PreferenceToggleState(this.titleText,this.subtitleText,this.leaveBottomSpace,this.getPreference,this.onChanged);
 
+  late Future<bool?> preferenceValue;
+
+  GlobalKey<YouSwitchListTileState> switchListTileKey=GlobalKey<YouSwitchListTileState>();
+
+  @override
+  void initState() {
+    preferenceValue=getPreference();
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         FutureBuilder(
-          future: getPreference(),
+          future: preferenceValue,
           builder: (BuildContext context,AsyncSnapshot<bool?> snapshot){
             if(!snapshot.hasData){
               return const LinearProgressIndicator();
             }
-            return SwitchListTile(
+            return YouSwitchListTile(
+              key: switchListTileKey,
               title: Text(titleText,style: const TextStyle(
                 fontSize: 18,
               ),),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25)
-              ),
               subtitle: Text(subtitleText),
               value: snapshot.data!,
               onChanged: (value) async {
                 await onChanged(value);
-                setState(() {});
               },
             );
           },

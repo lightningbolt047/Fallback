@@ -12,5 +12,6 @@ const Color kCodeBackgroundColor=Color(0xFFF4F0E8);
 const Color kAttentionItemColor=Color(0xFFFEDCBC);
 const Color kIconColor=Color(0xFF686750);
 const Color kFloatingActionButtonColor=Color(0xFFAEF0D6);
+const Color kDisabledColor=Color(0xFFA9A791);
 
 const int backupStringLengthQuanta=128;

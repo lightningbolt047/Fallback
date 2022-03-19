@@ -7,6 +7,7 @@ import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/custom_app_bar.dart';
 import 'package:fallback/widgets_basic/input_widgets/custom_text_field.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
+import 'package:fallback/widgets_basic/material_you/you_switch_list_tile.dart';
 import 'package:fallback/widgets_basic/page_subheading.dart';
 import 'package:fallback/widgets_basic/preference_toggle.dart';
 import 'package:fallback/config.dart';

@@ -82,7 +82,6 @@ class FirebaseServices{
       keyList.add(document['keys'][i] as String);
     }
     String decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
-    print(jsonDecode(decryptedKeysString));
     _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
 
   }
