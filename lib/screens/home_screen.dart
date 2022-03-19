@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:fallback/const.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/greeting_service.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:flutter/material.dart';
@@ -17,16 +18,16 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key,required this.secureStorage,required this.firebaseServices}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState(secureStorage,firebaseServices);
+  State<HomeScreen> createState() => HomeScreenState(secureStorage,firebaseServices);
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
 
 
   final SecureStorage secureStorage;
   final FirebaseServices firebaseServices;
 
-  _HomeScreenState(this.secureStorage,this.firebaseServices);
+  HomeScreenState(this.secureStorage,this.firebaseServices);
 
 
   late AnimationController _animationController;
@@ -35,20 +36,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late Future<Map<String,dynamic>> keys;
 
   void fetchKeys() async{
-    keys=secureStorage.readKeys();
-    await keys;
+    // keys=secureStorage.readKeys();
+    // await keys;
     setState(() {});
   }
 
 
-
-
   @override
   void initState() {
-    fetchKeys();
-    homeScreenTrigger.addListener(() {
-      fetchKeys();
-    });
+    // fetchKeys();
+    // homeScreenTrigger.addListener(() {
+    //   if(!mounted){
+    //     Timer(const Duration(milliseconds: 500),(){
+    //       setState(() {});
+    //     });
+    //   }else{
+    //     setState(() {});
+    //   }
+    // });
 
     _animationController=AnimationController(
       vsync: this,
@@ -156,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             FutureBuilder(
-              future: keys,
+              future: secureStorage.readKeys(),
               builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
-                if(!snapshot.hasData && !snapshot.hasError){
+                if(snapshot.connectionState==ConnectionState.waiting || (!snapshot.hasData && !snapshot.hasError)){
                   return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),));
                 }
                 if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
@@ -173,6 +178,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         keyList: snapshot.data!['businesses'][i]['codes'],
                         lastModified: snapshot.data!['businesses'][i]['lastModified'],
                         secureStorage: secureStorage,
+                        onSuccess: fetchKeys
                       ),
                   ]),
                 );

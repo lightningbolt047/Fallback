@@ -41,6 +41,7 @@ class YouSwitchListTileState extends State<YouSwitchListTile> {
         }else{
           switchKey.currentState!.setOn();
         }
+        value=!value;
       },
       trailing: YouSwitch(
         value: value,

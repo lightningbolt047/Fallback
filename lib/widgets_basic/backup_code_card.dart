@@ -1,6 +1,5 @@
 import 'package:fallback/const.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:flutter/material.dart';
 import 'package:fallback/services/asset_mapping.dart';
@@ -15,10 +14,11 @@ class BackupCodeCard extends StatefulWidget {
   final List<dynamic> keyList;
   final int lastModified;
   final SecureStorage secureStorage;
-  const BackupCodeCard({Key? key, required this.businessName, required this.nickname, required this.keyList,required this.lastModified, required this.secureStorage}) : super(key: key);
+  final VoidCallback onSuccess;
+  const BackupCodeCard({Key? key, required this.businessName, required this.nickname, required this.keyList,required this.lastModified, required this.secureStorage, required this.onSuccess}) : super(key: key);
 
   @override
-  State<BackupCodeCard> createState() => _BackupCodeCardState(businessName,nickname,keyList,lastModified,secureStorage);
+  State<BackupCodeCard> createState() => _BackupCodeCardState(businessName,nickname,keyList,lastModified,secureStorage,onSuccess);
 }
 
 class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProviderStateMixin {
@@ -28,13 +28,15 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
   final List<dynamic> keyList;
   final int lastModified;
   final SecureStorage secureStorage;
+  final VoidCallback onSuccess;
 
-  _BackupCodeCardState(this.businessName,this.nickname,this.keyList,this.lastModified,this.secureStorage);
+  _BackupCodeCardState(this.businessName,this.nickname,this.keyList,this.lastModified,this.secureStorage,this.onSuccess);
 
 
   bool _isExpanded=false;
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+
 
 
   @override
@@ -72,6 +74,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
         child: Column(
           children: [
             InkWell(
+              borderRadius: BorderRadius.circular(16),
               onTap: (){
                 setState(() {
                   if(_isExpanded){
@@ -97,12 +100,13 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                           fontSize: 24,
                           fontWeight: FontWeight.w400
                       ),),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width*0.6,
+                      if(nickname!="")
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width*0.6,
+                          ),
+                          child: Text(nickname,maxLines: 1,overflow: TextOverflow.ellipsis,),
                         ),
-                        child: Text(nickname,maxLines: 1,overflow: TextOverflow.ellipsis,),
-                      ),
                     ],
                   ),
                   const Spacer(),
@@ -245,7 +249,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                                         await secureStorage.deleteKey(lastModified, businessName);
                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Deleted key successfully")));
                                         Navigator.pop(context);
-                                        homeScreenTrigger.triggerHomeScreenUpdate();
+                                        onSuccess();
                                       }catch(e){
                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to delete key")));
                                       }

@@ -23,6 +23,8 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
 
   Screen _selectedScreen=Screen.home;
 
+  final GlobalKey<HomeScreenState> _homeScreenKey=GlobalKey<HomeScreenState>();
+
   late Future<SecureStorage> _secureStorage;
 
   void biometricAvailabilityCheck() async{
@@ -145,7 +147,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
                 ),
                 child: const Icon(Icons.add,color: Colors.black,),
               ),
-              openBuilder: (BuildContext context,VoidCallback closeContainer)=>AddCodeScreen(secureStorage: snapshot.data!,),
+              openBuilder: (BuildContext context,VoidCallback closeContainer)=>AddCodeScreen(secureStorage: snapshot.data!, onSuccess: _homeScreenKey.currentState!.fetchKeys),
             );
           }
         ),
@@ -191,7 +193,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
               if(_selectedScreen==Screen.settings){
                 return SettingsScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices,);
               }
-              return HomeScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices);
+              return HomeScreen(key:_homeScreenKey, secureStorage: snapshot.data!, firebaseServices: firebaseServices);
             },
           );
         }

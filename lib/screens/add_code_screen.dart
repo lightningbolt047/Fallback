@@ -1,7 +1,6 @@
 import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
 import 'package:fallback/services/secure_storage.dart';
-import 'package:fallback/utils/home_screen_trigger.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/compound/counter_toggle.dart';
 import 'package:fallback/widgets_basic/input_widgets/code_segment_input.dart';
@@ -14,18 +13,20 @@ import '../widgets_basic/input_widgets/custom_text_field.dart';
 class AddCodeScreen extends StatefulWidget {
 
   final SecureStorage secureStorage;
+  final VoidCallback onSuccess;
 
-  const AddCodeScreen({Key? key,required this.secureStorage,}) : super(key: key);
+  const AddCodeScreen({Key? key,required this.secureStorage, required this.onSuccess,}) : super(key: key);
 
   @override
-  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,);
+  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,onSuccess);
 }
 
 class _AddCodeScreenState extends State<AddCodeScreen> {
 
   final SecureStorage secureStorage;
+  final VoidCallback onSuccess;
 
-  _AddCodeScreenState(this.secureStorage,);
+  _AddCodeScreenState(this.secureStorage,this.onSuccess);
 
 
 
@@ -120,7 +121,8 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                 try{
                   await secureStorage.addKey(key);
                   Navigator.pop(context);
-                  homeScreenTrigger.triggerHomeScreenUpdate();
+                  onSuccess();
+                  // homeScreenTrigger.triggerHomeScreenUpdate();
                 }catch(e){
                   showDialog(
                     context: context,
