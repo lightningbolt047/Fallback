@@ -105,6 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                   onTap: (){
                     showDialog(
                       context: context,
+                      barrierDismissible: false,
                       builder: (context)=>FutureBuilder(
                         future: secureStorage.readEncryptionPassword(),
                         builder: (BuildContext context,AsyncSnapshot<String?> snapshot) {
@@ -381,7 +382,6 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                             );
                           },
                         ),
-
                       );
                     },
                   ),

@@ -146,15 +146,15 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                 if(snapshot.connectionState==ConnectionState.waiting || (!snapshot.hasData && !snapshot.hasError)){
                   return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),));
                 }
-                if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
-                  return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
-                }
+                // if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
+                //   return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
+                // }
                 return SliverList(
                   delegate: SliverChildListDelegate.fixed([
                     AnimatedSize(
                       duration: const Duration(milliseconds:250),
                       child: FutureBuilder(
-                        future: firebaseServices.performCloudSync(),
+                        future: firebaseServices.performCloudSync(context),
                         builder: (BuildContext context, AsyncSnapshot<CloudSyncStatus> snapshot){
                           if(snapshot.connectionState==ConnectionState.waiting){
                             return const CloudSyncStateCard(
@@ -173,18 +173,45 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                 fontSize: 18,
                               ),),
                             );
+                          }else if(snapshot.data==CloudSyncStatus.notSignedIn){
+                            return CloudSyncStateCard(
+                              leading: const Icon(Icons.cloud_off_outlined, color: kIconColor,),
+                              title: const Text("Not Signed In", style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),),
+                              subtitle: const Text("Important! Read More",style: TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),),
+                              onTap: (){
+                                showDialog(
+                                  context: context,
+                                  builder: (context)=>YouAlertDialog(
+                                    title: const Text("Attention",style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),),
+                                    backgroundColor: kBackgroundColor,
+                                    content: const Text("Old users: If you have used this app before and want to restore a cloud backup, please do not make any modifications by adding or removing keys. Please sign in to your account, set you encryption password as your old password and come back to this screen to restore your keys.\n\nNew users: You are free to login to cloud to safely backup your keys. Cloud backups are completely encrypted by your encryption password"),
+                                    actions: [
+                                      CustomMaterialButton(
+                                        child: const Text("OK",style: TextStyle(
+                                          color: kBackgroundColor,
+                                        ),),
+                                        buttonColor: kIconColor,
+                                        onPressed: (){
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
                           }else if(snapshot.data==CloudSyncStatus.encryptionPasswordNotSet){
                             return const CloudSyncStateCard(
                               leading: Icon(Icons.lock_open_rounded, color: kIconColor,),
                               title: Text("Set encryption password",style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20,
-                              ),),
-                            );
-                          }else if(snapshot.data==CloudSyncStatus.notSignedIn){
-                            return const CloudSyncStateCard(
-                              leading: Icon(Icons.cloud_off_outlined, color: kIconColor,),
-                              title: Text("Not Signed In", style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 20,
                               ),),

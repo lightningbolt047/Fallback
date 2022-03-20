@@ -70,6 +70,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
               return Text(subtitleText,);
             },
           ),
+          backgroundColor: kBackgroundColor,
           actions: const [],
         ),
       ),

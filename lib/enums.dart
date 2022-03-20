@@ -26,4 +26,6 @@ enum CloudSyncStatus{
   encryptionPasswordNotSet,
   notSignedIn,
   networkError,
+  userCancelled,
+  wrongEncryptionPassword,
 }
