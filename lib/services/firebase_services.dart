@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:fallback/const.dart';
+import 'package:fallback/enums.dart';
 import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/string_services.dart';
@@ -50,7 +51,7 @@ class FirebaseServices{
     await _secureStorage.writeUserID(null);
   }
 
-  Future<void> createCloudBackup() async{
+  Future<void> _createCloudBackup() async{
     // DocumentSnapshot document=await _databaseInstance.collection('userData').doc(await _secureStorage.readUserID()).get();
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
     String? userID=await _secureStorage.readUserID();
@@ -66,7 +67,7 @@ class FirebaseServices{
     });
   }
 
-  Future<void> restoreCloudBackup() async{
+  Future<void> _restoreCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
     String? userID=await _secureStorage.readUserID();
 
@@ -84,6 +85,36 @@ class FirebaseServices{
     String decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
     _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
 
+  }
+
+  Future<CloudSyncStatus> checkCloudSyncStatus() async{
+
+    String? userID=await _secureStorage.readUserID();
+
+    if(userID==null){
+      throw "USER_NOT_SIGNED_IN";
+    }
+
+    DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+    int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
+    int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
+
+    if(cloudLastUpdated>localLastUpdated){
+      return CloudSyncStatus.cloudLatest;
+    }else if(cloudLastUpdated<localLastUpdated){
+      return CloudSyncStatus.localLatest;
+    }else{
+      return CloudSyncStatus.inSync;
+    }
+  }
+
+  Future<void> performCloudSync() async{
+    CloudSyncStatus cloudSyncStatus=await checkCloudSyncStatus();
+    if(cloudSyncStatus==CloudSyncStatus.localLatest){
+      await _createCloudBackup();
+    }else if(cloudSyncStatus==CloudSyncStatus.cloudLatest){
+      await _restoreCloudBackup();
+    }
   }
 
 }

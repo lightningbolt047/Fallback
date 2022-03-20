@@ -14,3 +14,9 @@ enum CloudAccountType{
   apple,
   github,
 }
+
+enum CloudSyncStatus{
+  localLatest,
+  cloudLatest,
+  inSync,
+}

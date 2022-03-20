@@ -33,7 +33,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   late AnimationController _animationController;
   late Animation<double> _animation;
 
-  late Future<Map<String,dynamic>> keys;
+  // late Future<Map<String,dynamic>> keys;
 
   void fetchKeys() async{
     // keys=secureStorage.readKeys();
@@ -169,6 +169,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                 if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
                   return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
                 }
+                firebaseServices.performCloudSync();
                 return SliverList(
                   delegate: SliverChildListDelegate.fixed([
                     for(int i=0;i<snapshot.data!['businesses'].length;i++)

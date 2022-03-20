@@ -21,7 +21,7 @@ class SecureStorage{
     return await _biometricStorage.canAuthenticate();
   }
 
-  Future<Map<String,dynamic>> readFullFile() async{
+  Future<Map<String,dynamic>> _readFullFile() async{
 
     if(_storage!=null && (jsonDecode(_storage!)['keys']!=null || jsonDecode(_storage!)['encryptionPassword']!=null)){
       return jsonDecode(_storage!);
@@ -32,23 +32,23 @@ class SecureStorage{
       _storage ??= jsonEncode({'keys':{'businesses':[],'lastModified':0}});
       return jsonDecode(_storage!);
     }on AuthException{
-      return await readFullFile();
+      return await _readFullFile();
     }
   }
 
-  Future<void> writeFullFile(Map<String,dynamic> map) async{
+  Future<void> _writeFullFile(Map<String,dynamic> map) async{
     try{
       String fullDataEncoded=jsonEncode(map);
       await _keyStore.write(fullDataEncoded);
       _storage=fullDataEncoded;
     }on AuthException{
-      await writeFullFile(map);
+      await _writeFullFile(map);
     }
   }
 
   Future<String?> readEncryptionPassword() async{
     try{
-      return (await readFullFile())['encryptionPassword'];
+      return (await _readFullFile())['encryptionPassword'];
     }catch(e){
       return Future.error(e);
     }
@@ -57,18 +57,18 @@ class SecureStorage{
   Future<void> writeEncryptionPassword(String password) async{
     Map<String,dynamic> cacheDecoded={};
     try{
-      cacheDecoded=await readFullFile();
+      cacheDecoded=await _readFullFile();
       cacheDecoded['encryptionPassword']=password;
     }catch(e){
       cacheDecoded['encryptionPassword']=password;
     }finally{
-      await writeFullFile(cacheDecoded);
+      await _writeFullFile(cacheDecoded);
     }
   }
 
   Future<String?> readUserID() async{
     try{
-      return (await readFullFile())['userID'];
+      return (await _readFullFile())['userID'];
     }catch(e){
       return Future.error(e);
     }
@@ -77,35 +77,35 @@ class SecureStorage{
   Future<void> writeUserID(String? userID) async{
     Map<String,dynamic> cacheDecoded={};
     try{
-      cacheDecoded=await readFullFile();
+      cacheDecoded=await _readFullFile();
       cacheDecoded['userID']=userID;
     }catch(e){
       cacheDecoded['userID']=userID;
     }finally{
-      await writeFullFile(cacheDecoded);
+      await _writeFullFile(cacheDecoded);
     }
   }
 
   Future<Map<String,dynamic>> readKeys() async{
-    Map<String,dynamic> cacheDecoded=await readFullFile();
+    Map<String,dynamic> cacheDecoded=await _readFullFile();
     return cacheDecoded['keys'];
   }
 
   Future<void> addKey(Map<String,dynamic> key) async{
-    Map<String,dynamic> cacheDecoded=await readFullFile();
+    Map<String,dynamic> cacheDecoded=await _readFullFile();
     cacheDecoded['keys']['businesses'].add(key);
     cacheDecoded['keys']['lastModified']=key['lastModified'];
-    await writeFullFile(cacheDecoded);
+    await _writeFullFile(cacheDecoded);
   }
 
   Future<void> setAllKeys(Map<String,dynamic> keys) async{
-    Map<String,dynamic> cacheDecoded=await readFullFile();
+    Map<String,dynamic> cacheDecoded=await _readFullFile();
     cacheDecoded['keys']=keys;
-    await writeFullFile(cacheDecoded);
+    await _writeFullFile(cacheDecoded);
   }
 
   Future<void> deleteKey(int lastModified,String businessName) async{
-    Map<String,dynamic> cacheDecoded=await readFullFile();
+    Map<String,dynamic> cacheDecoded=await _readFullFile();
 
     for(int i=0;i<cacheDecoded['keys']['businesses'].length;i++){
       if(cacheDecoded['keys']['businesses'][i]['lastModified']==lastModified && cacheDecoded['keys']['businesses'][i]['businessName']==businessName){
@@ -114,7 +114,7 @@ class SecureStorage{
       }
     }
     cacheDecoded['keys']['lastModified']=DateTime.now().millisecondsSinceEpoch;
-    await writeFullFile(cacheDecoded);
+    await _writeFullFile(cacheDecoded);
   }
 
 
