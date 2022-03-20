@@ -26,7 +26,7 @@ class FirebaseServices{
     try{
       googleUser=await GoogleSignIn().signInSilently();
       if(googleUser==null){
-        throw "Silent Sign In Failed";
+        throw "SILENT_SIGN_IN_FAILED";
       }
     }catch(e){
       googleUser=await GoogleSignIn().signIn();
@@ -51,70 +51,107 @@ class FirebaseServices{
     await _secureStorage.writeUserID(null);
   }
 
-  Future<void> _createCloudBackup() async{
-    // DocumentSnapshot document=await _databaseInstance.collection('userData').doc(await _secureStorage.readUserID()).get();
-    String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    String? userID=await _secureStorage.readUserID();
-    if(encryptionPassword==null || userID==null){
-      return;
-    }
-    Map<String,dynamic> keys=await _secureStorage.readKeys();
-    String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
-
-    await _databaseInstance.collection('userData').doc(userID).set({
-      "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
-      "lastModified": keys['lastModified'],
-    });
-  }
-
-  Future<void> _restoreCloudBackup() async{
+  Future<CloudSyncStatus> _createCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
     String? userID=await _secureStorage.readUserID();
 
-    if(encryptionPassword==null || userID==null){
-      return;
+    if(encryptionPassword==null){
+      return CloudSyncStatus.encryptionPasswordNotSet;
     }
-
-    DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
-
-    Map<String,dynamic> document=documentSnapshot.data() as Map<String,dynamic>;
-    List<String> keyList=[];
-    for(int i=0;i<document['keys'].length;i++){
-      keyList.add(document['keys'][i] as String);
-    }
-    String decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
-    _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
-
-  }
-
-  Future<CloudSyncStatus> checkCloudSyncStatus() async{
-
-    String? userID=await _secureStorage.readUserID();
-
     if(userID==null){
-      throw "USER_NOT_SIGNED_IN";
+      return CloudSyncStatus.notSignedIn;
     }
 
-    DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
-    int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
-    int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
+    try{
+      Map<String,dynamic> keys=await _secureStorage.readKeys();
+      String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
-    if(cloudLastUpdated>localLastUpdated){
-      return CloudSyncStatus.cloudLatest;
-    }else if(cloudLastUpdated<localLastUpdated){
-      return CloudSyncStatus.localLatest;
-    }else{
-      return CloudSyncStatus.inSync;
+      await _databaseInstance.collection('userData').doc(userID).set({
+        "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
+        "lastModified": keys['lastModified'],
+      });
+
+      return CloudSyncStatus.success;
+    }catch(e){
+      return CloudSyncStatus.networkError;
+    }
+
+  }
+
+  Future<CloudSyncStatus> _restoreCloudBackup() async{
+    String? encryptionPassword=await _secureStorage.readEncryptionPassword();
+    String? userID=await _secureStorage.readUserID();
+
+    if(encryptionPassword==null){
+      return CloudSyncStatus.encryptionPasswordNotSet;
+    }
+    if(userID==null){
+      return CloudSyncStatus.notSignedIn;
+    }
+
+    try{
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+
+      Map<String,dynamic> document=documentSnapshot.data() as Map<String,dynamic>;
+      List<String> keyList=[];
+      for(int i=0;i<document['keys'].length;i++){
+        keyList.add(document['keys'][i] as String);
+      }
+      String decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
+      _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
+
+      return CloudSyncStatus.success;
+    }catch(e){
+      return CloudSyncStatus.networkError;
+    }
+
+  }
+
+  Future<CloudSyncType> checkCloudSyncRequired() async{
+
+    try{
+      String? userID=await _secureStorage.readUserID();
+
+      if(userID==null){
+        return Future.error("USER_NOT_SIGNED_IN");
+      }
+
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+      int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
+      int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
+
+      if(cloudLastUpdated>localLastUpdated){
+        return CloudSyncType.cloudLatest;
+      }else if(cloudLastUpdated<localLastUpdated){
+        return CloudSyncType.localLatest;
+      }else{
+        return CloudSyncType.inSync;
+      }
+    }catch(e){
+      return Future.error("NETWORK_CONNECTION_ERROR");
     }
   }
 
-  Future<void> performCloudSync() async{
-    CloudSyncStatus cloudSyncStatus=await checkCloudSyncStatus();
-    if(cloudSyncStatus==CloudSyncStatus.localLatest){
-      await _createCloudBackup();
-    }else if(cloudSyncStatus==CloudSyncStatus.cloudLatest){
-      await _restoreCloudBackup();
+  Future<CloudSyncStatus> performCloudSync() async{
+
+    String? encryptionPassword=await _secureStorage.readEncryptionPassword();
+    String? userID=await _secureStorage.readUserID();
+
+    if(encryptionPassword==null){
+      return CloudSyncStatus.encryptionPasswordNotSet;
     }
+    if(userID==null){
+      return CloudSyncStatus.notSignedIn;
+    }
+
+
+    CloudSyncType cloudSyncStatus=await checkCloudSyncRequired();
+    if(cloudSyncStatus==CloudSyncType.localLatest){
+      return await _createCloudBackup();
+    }else if(cloudSyncStatus==CloudSyncType.cloudLatest){
+      return await _restoreCloudBackup();
+    }
+    return CloudSyncStatus.success;
   }
 
 }

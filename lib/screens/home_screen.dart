@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:fallback/const.dart';
+import 'package:fallback/enums.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/greeting_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/widgets_basic/backup_code_card.dart';
+import 'package:fallback/widgets_basic/cloud_sync_state_card.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -138,28 +140,6 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
             // SliverToBoxAdapter(
             //   child: ,
             // ),
-            SliverToBoxAdapter(
-              child: Card(
-                color: kAttentionItemColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                margin: const EdgeInsets.only(top: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      CircularProgressIndicator(color: kIconColor,strokeWidth: 2,),
-                      Text("Syncing with Cloud",style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20
-                      ),),
-                    ],
-                  ),
-                ),
-              ),
-            ),
             FutureBuilder(
               future: secureStorage.readKeys(),
               builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
@@ -169,9 +149,53 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                 if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
                   return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
                 }
-                firebaseServices.performCloudSync();
                 return SliverList(
                   delegate: SliverChildListDelegate.fixed([
+                    AnimatedSize(
+                      duration: const Duration(milliseconds:250),
+                      child: FutureBuilder(
+                        future: firebaseServices.performCloudSync(),
+                        builder: (BuildContext context, AsyncSnapshot<CloudSyncStatus> snapshot){
+                          if(snapshot.connectionState==ConnectionState.waiting){
+                            return const CloudSyncStateCard(
+                              leading: CircularProgressIndicator(color: kIconColor, strokeWidth: 2,),
+                              title: Text("Syncing with Cloud",style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 20
+                              ),),
+                            );
+                          }
+                          if(snapshot.data==CloudSyncStatus.networkError){
+                            return const CloudSyncStateCard(
+                              leading: Icon(Icons.cloud_off_rounded, color: kIconColor,),
+                              title: Text("Check you internet connection",style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),),
+                            );
+                          }else if(snapshot.data==CloudSyncStatus.encryptionPasswordNotSet){
+                            return const CloudSyncStateCard(
+                              leading: Icon(Icons.lock_open_rounded, color: kIconColor,),
+                              title: Text("Set encryption password",style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),),
+                            );
+                          }else if(snapshot.data==CloudSyncStatus.notSignedIn){
+                            return const CloudSyncStateCard(
+                              leading: Icon(Icons.cloud_off_outlined, color: kIconColor,),
+                              title: Text("Not Signed In", style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),),
+                            );
+                          }
+                          return Container(
+                            height: 25,
+                          );
+                        },
+                      ),
+                    ),
                     for(int i=0;i<snapshot.data!['businesses'].length;i++)
                       BackupCodeCard(
                         businessName: snapshot.data!['businesses'][i]['businessName'],

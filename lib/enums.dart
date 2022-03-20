@@ -15,8 +15,15 @@ enum CloudAccountType{
   github,
 }
 
-enum CloudSyncStatus{
+enum CloudSyncType{
   localLatest,
   cloudLatest,
   inSync,
+}
+
+enum CloudSyncStatus{
+  success,
+  encryptionPasswordNotSet,
+  notSignedIn,
+  networkError,
 }
