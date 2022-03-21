@@ -344,7 +344,45 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                     titleText: "Restore Backup",
                     subtitleText: "Import encrypted backups using the password used to encrypt the backup",
                     leading: const Icon(Icons.restore_rounded, color: kIconColor,),
-                    onTap: (){},
+                    onTap: (){
+                      BuildContext settingsScreenContext=context;
+                      showDialog(
+                        context: context,
+                        builder: (context){
+                          return YouAlertDialog(
+                            title: const Text("Are you sure?",style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),),
+                            backgroundColor: kBackgroundColor,
+                            content: const Text("Restoring a backup will replace existing content"),
+                            actions: [
+                              OutlinedButton(
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Cancel",style: TextStyle(color: kIconColor),),
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  side: const BorderSide(color: kIconColor),
+                                  primary: kIconColor,
+                                ),
+                              ),
+                              CustomMaterialButton(
+                                child: const Text("OK",style: TextStyle(
+                                  color: kBackgroundColor,
+                                ),),
+                                buttonColor: kIconColor,
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  _localBackupService.restoreAllKeys(settingsScreenContext);
+                                },
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
                 SliverToBoxAdapter(
