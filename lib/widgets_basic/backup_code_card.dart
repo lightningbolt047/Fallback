@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:fallback/const.dart';
+import 'package:fallback/enums.dart';
 import 'package:fallback/screens/add_code_screen.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
@@ -208,7 +209,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                       openContainer();
                     },
                   ),
-                  openBuilder: (BuildContext context,Function closeContainer)=>AddCodeScreen(secureStorage: secureStorage, onSuccess: onSuccess, businessName: businessName, nickname: nickname, codes: keyList,),
+                  openBuilder: (BuildContext context,Function closeContainer)=>AddCodeScreen(secureStorage: secureStorage, onSuccess: onSuccess, businessName: businessName, nickname: nickname, codes: keyList,keysInputType: KeysInputType.edit,lastModified: lastModified,),
                   useRootNavigator: true,
                   closedElevation: 0,
                   closedColor: Colors.transparent,

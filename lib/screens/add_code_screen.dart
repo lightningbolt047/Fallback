@@ -16,12 +16,14 @@ class AddCodeScreen extends StatefulWidget {
   final VoidCallback onSuccess;
   final String? businessName;
   final String? nickname;
+  final int? lastModified;
   final List<List<String>>? codes;
+  final KeysInputType keysInputType;
 
-  const AddCodeScreen({Key? key,required this.secureStorage, required this.onSuccess,this.businessName,this.nickname,this.codes}) : super(key: key);
+  const AddCodeScreen({Key? key,required this.secureStorage, required this.onSuccess,this.businessName,this.nickname,this.codes,this.lastModified, required this.keysInputType}) : super(key: key);
 
   @override
-  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,onSuccess,businessName,nickname,codes);
+  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,onSuccess,businessName,nickname,codes,lastModified,keysInputType);
 }
 
 class _AddCodeScreenState extends State<AddCodeScreen> {
@@ -30,16 +32,18 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
   final VoidCallback onSuccess;
   final String? _businessName;
   final String? _nickname;
+  final int? lastModified;
   final List<List<String>>? codes;
+  final KeysInputType keysInputType;
 
-  _AddCodeScreenState(this.secureStorage,this.onSuccess,this._businessName,this._nickname,this.codes);
+  _AddCodeScreenState(this.secureStorage,this.onSuccess,this._businessName,this._nickname,this.codes,this.lastModified,this.keysInputType);
 
 
   late final TextEditingController _businessNameInputController;
   late final TextEditingController _nicknameInputController;
-  List<List<TextEditingController>> _codeInputControllers=[];
+  final List<List<TextEditingController>> _codeInputControllers=[];
 
-  List<TextEditingController> _codeInputControllersToDispose=[];
+  final List<TextEditingController> _codeInputControllersToDispose=[];
 
   String _businessIconPath="no_company.png";
   late int _numCols;
@@ -204,7 +208,11 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                 key['codes']=codes;
                 key['lastModified']=DateTime.now().millisecondsSinceEpoch;
                 try{
-                  await secureStorage.addKey(key);
+                  if(keysInputType==KeysInputType.add){
+                    await secureStorage.addKey(key);
+                  }else{
+                    await secureStorage.modifyKey(key, lastModified!);
+                  }
                   Navigator.pop(context);
                   onSuccess();
                   // homeScreenTrigger.triggerHomeScreenUpdate();
@@ -239,7 +247,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ScreenHeaderText(text: "Add 2FA Backup Key"),
+              ScreenHeaderText(text: "${keysInputType==KeysInputType.add?"Add":"Edit"} 2FA Backup Key"),
               const SizedBox(
                 height: 100,
               ),

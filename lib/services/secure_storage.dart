@@ -98,6 +98,18 @@ class SecureStorage{
     await _writeFullFile(cacheDecoded);
   }
 
+  Future<void> modifyKey(Map<String,dynamic> key,int oldLastModified) async{
+    Map<String,dynamic> cacheDecoded=await _readFullFile();
+    for(int i=0;i<cacheDecoded['keys']['businesses'].length;i++){
+      if(cacheDecoded['keys']['businesses'][i]['lastModified']==oldLastModified){
+        cacheDecoded['keys']['businesses'][i]=key;
+        cacheDecoded['keys']['lastModified']=key['lastModified'];
+        break;
+      }
+    }
+    await _writeFullFile(cacheDecoded);
+  }
+
   Future<void> setAllKeys(Map<String,dynamic> keys) async{
     Map<String,dynamic> cacheDecoded=await _readFullFile();
     cacheDecoded['keys']=keys;

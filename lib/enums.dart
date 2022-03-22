@@ -15,6 +15,11 @@ enum CloudAccountType{
   github,
 }
 
+enum KeysInputType{
+  add,
+  edit,
+}
+
 enum CloudSyncType{
   localLatest,
   cloudLatest,

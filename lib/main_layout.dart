@@ -133,7 +133,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
             return OpenContainer(
               middleColor: kFloatingActionButtonColor,
               useRootNavigator: true,
-              transitionDuration: const Duration(milliseconds: 500),
+              transitionDuration: const Duration(milliseconds: 300),
               transitionType: ContainerTransitionType.fadeThrough,
               closedShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)
@@ -148,7 +148,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
                 ),
                 child: const Icon(Icons.add,color: Colors.black,),
               ),
-              openBuilder: (BuildContext context,VoidCallback closeContainer)=>AddCodeScreen(secureStorage: snapshot.data!, onSuccess: _homeScreenKey.currentState!.fetchKeys),
+              openBuilder: (BuildContext context,VoidCallback closeContainer)=>AddCodeScreen(secureStorage: snapshot.data!, onSuccess: _homeScreenKey.currentState!.fetchKeys,keysInputType: KeysInputType.add,),
             );
           }
         ),
