@@ -66,21 +66,21 @@ class SecureStorage{
     }
   }
 
-  Future<String?> readUserID() async{
+  Future<Map<String,dynamic>?> readUserDetails() async{
     try{
-      return (await _readFullFile())['userID'];
+      return (await _readFullFile())['userDetails'];
     }catch(e){
       return Future.error(e);
     }
   }
 
-  Future<void> writeUserID(String? userID) async{
+  Future<void> writeUserDetails(Map<String,dynamic>? userID) async{
     Map<String,dynamic> cacheDecoded={};
     try{
       cacheDecoded=await _readFullFile();
-      cacheDecoded['userID']=userID;
+      cacheDecoded['userDetails']=userID;
     }catch(e){
-      cacheDecoded['userID']=userID;
+      cacheDecoded['userDetails']=userID;
     }finally{
       await _writeFullFile(cacheDecoded);
     }

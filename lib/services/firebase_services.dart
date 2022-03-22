@@ -43,26 +43,33 @@ class FirebaseServices{
       accessToken: googleAuth?.accessToken,
     );
 
-    if(await _secureStorage.readUserID()!=googleUser?.id){
-      await _secureStorage.writeUserID(googleUser!.id);
+    Map<String,dynamic>? currentUserDetails=await _secureStorage.readUserDetails();
+
+    if(currentUserDetails==null || currentUserDetails['userID']!=googleUser?.id){
+      currentUserDetails={
+        "userID":googleUser!.id,
+        "displayName":googleUser.displayName,
+        "photoURL":googleUser.photoUrl,
+      };
+      await _secureStorage.writeUserDetails(currentUserDetails);
     }
 
     return FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   Future<void> signOutOfGoogle() async{
+    await _secureStorage.writeUserDetails(null);
     await GoogleSignIn().signOut();
-    await _secureStorage.writeUserID(null);
   }
 
   Future<CloudSyncStatus> _createCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    String? userID=await _secureStorage.readUserID();
+    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
 
     if(encryptionPassword==null){
       return CloudSyncStatus.encryptionPasswordNotSet;
     }
-    if(userID==null){
+    if(userDetails==null || userDetails['userID']==null){
       return CloudSyncStatus.notSignedIn;
     }
 
@@ -70,7 +77,7 @@ class FirebaseServices{
       Map<String,dynamic> keys=await _secureStorage.readKeys();
       String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
-      await _databaseInstance.collection('userData').doc(userID).set({
+      await _databaseInstance.collection('userData').doc(userDetails['userID']).set({
         "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
         "lastModified": keys['lastModified'],
       });
@@ -84,17 +91,17 @@ class FirebaseServices{
 
   Future<CloudSyncStatus> _restoreCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    String? userID=await _secureStorage.readUserID();
+    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
 
     if(encryptionPassword==null){
       return CloudSyncStatus.encryptionPasswordNotSet;
     }
-    if(userID==null){
+    if(userDetails==null || userDetails['userID']==null){
       return CloudSyncStatus.notSignedIn;
     }
 
     try{
-      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userDetails['userID']).get();
 
       Map<String,dynamic> document=documentSnapshot.data() as Map<String,dynamic>;
       List<String> keyList=[];
@@ -119,13 +126,13 @@ class FirebaseServices{
   Future<CloudSyncType> checkCloudSyncRequired() async{
 
     try{
-      String? userID=await _secureStorage.readUserID();
+      Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
 
-      if(userID==null){
+      if(userDetails==null || userDetails['userID']==null){
         return Future.error("USER_NOT_SIGNED_IN");
       }
 
-      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userDetails['userID']).get();
       int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
       int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
 
@@ -144,9 +151,9 @@ class FirebaseServices{
   Future<CloudSyncStatus> performCloudSync(BuildContext context) async{
 
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    String? userID=await _secureStorage.readUserID();
+    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
 
-    if(userID==null){
+    if(userDetails==null || userDetails['userID']==null){
       return CloudSyncStatus.notSignedIn;
     }
     if(encryptionPassword==null){
