@@ -85,73 +85,69 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       opacity: _animation,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: CustomScrollView(
-          slivers: [
-            CustomSliverAppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.search_rounded,color: kIconColor,),
-                onPressed: () {},
-              ),
-              titleText: getGreeting(),
-              actions: [
-                CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  child: IconButton(
-                    icon: const Icon(Icons.supervised_user_circle),
-                    color: kIconColor,
-                    onPressed: (){
-                      showDialog(
-                        context: context,
-                        builder: (context)=>YouAlertDialog(
-                          title: const Text("Force Stop?",style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600
-                          ),),
-                          content: const Text("If you force stop an app, it may misbehave",),
-                          backgroundColor: kBackgroundColor,
-                          actions: [
-                            OutlinedButton(
-                              onPressed: (){
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Cancel",style: TextStyle(color: kIconColor),),
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                side: const BorderSide(color: kIconColor),
-                                primary: kIconColor,
-                              ),
-                            ),
-                            CustomMaterialButton(
-                              child: const Text("OK",style: TextStyle(color: kBackgroundColor,),),
-                              buttonColor: kIconColor,
-                              onPressed: (){
+        child: FutureBuilder(
+            future: secureStorage.readKeys(),
+            builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
+              if(snapshot.connectionState==ConnectionState.waiting || (!snapshot.hasData && !snapshot.hasError)){
+                return const Center(child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),);
+              }
+              // if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
+              //   return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
+              // }
+              return CustomScrollView(
+                slivers: [
+                  CustomSliverAppBar(
+                    leading: IconButton(
+                      icon: const Icon(Icons.search_rounded,color: kIconColor,),
+                      onPressed: () {},
+                    ),
+                    titleText: getGreeting(),
+                    actions: [
+                      CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        child: IconButton(
+                          icon: const Icon(Icons.supervised_user_circle),
+                          color: kIconColor,
+                          onPressed: (){
+                            showDialog(
+                              context: context,
+                              builder: (context)=>YouAlertDialog(
+                                title: const Text("Force Stop?",style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600
+                                ),),
+                                content: const Text("If you force stop an app, it may misbehave",),
+                                backgroundColor: kBackgroundColor,
+                                actions: [
+                                  OutlinedButton(
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("Cancel",style: TextStyle(color: kIconColor),),
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                      side: const BorderSide(color: kIconColor),
+                                      primary: kIconColor,
+                                    ),
+                                  ),
+                                  CustomMaterialButton(
+                                    child: const Text("OK",style: TextStyle(color: kBackgroundColor,),),
+                                    buttonColor: kIconColor,
+                                    onPressed: (){
 
-                              },
-                            ),
-                          ],
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
+                    backgroundColor: Colors.transparent,
                   ),
-                ),
-              ],
-              backgroundColor: Colors.transparent,
-            ),
-            // SliverToBoxAdapter(
-            //   child: ,
-            // ),
-            FutureBuilder(
-              future: secureStorage.readKeys(),
-              builder: (BuildContext context, AsyncSnapshot<Map<String,dynamic>> snapshot) {
-                if(snapshot.connectionState==ConnectionState.waiting || (!snapshot.hasData && !snapshot.hasError)){
-                  return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),));
-                }
-                // if(snapshot.hasError || snapshot.data!['businesses'].isEmpty){
-                //   return const SliverToBoxAdapter(child: Center(child: Text("No data"),));
-                // }
-                return SliverList(
-                  delegate: SliverChildListDelegate.fixed([
-                    AnimatedSize(
+                  SliverToBoxAdapter(
+                    child: AnimatedSize(
                       duration: const Duration(milliseconds:250),
                       child: FutureBuilder(
                         future: firebaseServices.performCloudSync(context),
@@ -223,20 +219,33 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                         },
                       ),
                     ),
-                    for(int i=0;i<snapshot.data!['businesses'].length;i++)
-                      BackupCodeCard(
-                        businessName: snapshot.data!['businesses'][i]['businessName'],
-                        nickname: snapshot.data!['businesses'][i]['nickname'],
-                        keyList: snapshot.data!['businesses'][i]['codes'],
-                        lastModified: snapshot.data!['businesses'][i]['lastModified'],
-                        secureStorage: secureStorage,
-                        onSuccess: fetchKeys
-                      ),
-                  ]),
-                );
-              }
-            ),
-          ],
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((BuildContext context, int index){
+                        List<List<String>> codesString=[];
+                        for(int i=0;i<snapshot.data!['businesses'][index]['codes'].length;i++){
+                          codesString.add([]);
+                          for(int j=0;j<snapshot.data!['businesses'][index]['codes'][i].length;j++){
+                            codesString[i].add(snapshot.data!['businesses'][index]['codes'][i][j]);
+                          }
+                        }
+
+                        return BackupCodeCard(
+                            businessName: snapshot.data!['businesses'][index]['businessName'],
+                            nickname: snapshot.data!['businesses'][index]['nickname'],
+                            keyList: codesString,
+                            lastModified: snapshot.data!['businesses'][index]['lastModified'],
+                            secureStorage: secureStorage,
+                            onSuccess: fetchKeys
+                        );
+                      },
+                      childCount: snapshot.data!['businesses'].length
+
+                    ),
+                  ),
+                ],
+              );
+            }
         ),
       ),
     );

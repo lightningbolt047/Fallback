@@ -2,11 +2,11 @@ import 'package:fallback/const.dart';
 import 'package:flutter/material.dart';
 
 class CodeSegmentInput extends StatelessWidget {
-  final Function onChanged;
+  final Function? onChanged;
   final bool? isLastField;
-  const CodeSegmentInput({Key? key,required this.onChanged,this.isLastField}) : super(key: key);
+  final TextEditingController? controller;
 
-
+  const CodeSegmentInput({Key? key,this.onChanged,this.isLastField,this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,7 @@ class CodeSegmentInput extends StatelessWidget {
             fillColor: kCodeBackgroundColor,
             filled: true,
           ),
+          controller: controller,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 20,
@@ -49,7 +50,9 @@ class CodeSegmentInput extends StatelessWidget {
           cursorHeight: 24,
           textInputAction: (isLastField==null || !isLastField!)?TextInputAction.next:TextInputAction.done,
           onChanged: (value){
-            onChanged(value);
+            if(onChanged!=null){
+              onChanged!(value);
+            }
           },
         ),
       ),

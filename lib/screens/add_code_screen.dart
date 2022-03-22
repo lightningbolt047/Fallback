@@ -14,66 +14,116 @@ class AddCodeScreen extends StatefulWidget {
 
   final SecureStorage secureStorage;
   final VoidCallback onSuccess;
+  final String? businessName;
+  final String? nickname;
+  final List<List<String>>? codes;
 
-  const AddCodeScreen({Key? key,required this.secureStorage, required this.onSuccess,}) : super(key: key);
+  const AddCodeScreen({Key? key,required this.secureStorage, required this.onSuccess,this.businessName,this.nickname,this.codes}) : super(key: key);
 
   @override
-  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,onSuccess);
+  State<AddCodeScreen> createState() => _AddCodeScreenState(secureStorage,onSuccess,businessName,nickname,codes);
 }
 
 class _AddCodeScreenState extends State<AddCodeScreen> {
 
   final SecureStorage secureStorage;
   final VoidCallback onSuccess;
+  final String? _businessName;
+  final String? _nickname;
+  final List<List<String>>? codes;
 
-  _AddCodeScreenState(this.secureStorage,this.onSuccess);
+  _AddCodeScreenState(this.secureStorage,this.onSuccess,this._businessName,this._nickname,this.codes);
 
 
+  late final TextEditingController _businessNameInputController;
+  late final TextEditingController _nicknameInputController;
+  List<List<TextEditingController>> _codeInputControllers=[];
 
-  String _businessName="";
-  String _nickname="";
+  List<TextEditingController> _codeInputControllersToDispose=[];
+
   String _businessIconPath="no_company.png";
-  int _numCols=2;
-  int _numRows=2;
+  late int _numCols;
+  late int _numRows;
 
-  List<List<String>> codes=[];
+  // List<List<String>> codes=[];
 
 
 
-  void initializeCodesList(){
-    for(int i=0;i<_numRows;i++){
-      codes.add([]);
-      for(int j=0;j<_numCols;j++){
-        codes[i].add("");
+  void initializeInputControllers(){
+    if(codes!=null){
+      _numRows=codes!.length;
+      _numCols=codes![0].length;
+      for(int i=0;i<_numRows;i++){
+        _codeInputControllers.add([]);
+        for(int j=0;j<_numCols;j++){
+          _codeInputControllers[i].add(TextEditingController(text: codes![i][j]));
+        }
+      }
+    }else{
+      _numRows=_numCols=2;
+      for(int i=0;i<_numRows;i++){
+        _codeInputControllers.add([]);
+        for(int j=0;j<_numCols;j++){
+          _codeInputControllers[i].add(TextEditingController());
+        }
+      }
+    }
+    _businessIconPath=AssetMapping.getBusinessIconPath(_businessName??"");
+    _businessNameInputController=TextEditingController(text: _businessName);
+    _nicknameInputController=TextEditingController(text: _nickname);
+  }
+
+  void addRowCodes(){
+    // List<String> newRow=[for(int i=0;i<_numCols;i++)""];
+    List<TextEditingController> newRow=[];
+    for(int i=0;i<_numCols;i++){
+      if(_codeInputControllersToDispose.isNotEmpty){
+        newRow.add(_codeInputControllersToDispose.removeLast());
+      }else{
+        newRow.add(TextEditingController());
+      }
+    }
+    _codeInputControllers.add(newRow);
+  }
+
+  void removeRowCodes(){
+    for(int i=0;i<_codeInputControllers.last.length;i++){
+      _codeInputControllers.last[i].text="";
+      _codeInputControllersToDispose.add(_codeInputControllers.last[i]);
+    }
+    _codeInputControllers.removeLast();
+  }
+
+  void addColumnCodes(){
+    for(int i=0;i<_codeInputControllers.length;i++){
+      if(_codeInputControllersToDispose.isNotEmpty){
+        _codeInputControllers[i].add(_codeInputControllersToDispose.removeLast());
+      }else{
+        _codeInputControllers[i].add(TextEditingController());
       }
     }
   }
 
-  void addRowCodes(){
-    List<String> newRow=[for(int i=0;i<_numCols;i++)""];
-    codes.add(newRow);
-  }
-
-  void removeRowCodes(){
-    codes.removeLast();
-  }
-
-  void addColumnCodes(){
-    for(int i=0;i<codes.length;i++){
-      codes[i].add("");
-    }
-  }
-
   void removeColumnCodes(){
-    for(int i=0;i<codes.length;i++){
-      codes[i].removeLast();
+    for(int i=0;i<_codeInputControllers.length;i++){
+      _codeInputControllers[i].last.text="";
+      _codeInputControllersToDispose.add(_codeInputControllers[i].removeLast());
     }
   }
 
   @override
   void initState() {
-    initializeCodesList();
+    initializeInputControllers();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    for(int i=0;i<_codeInputControllersToDispose.length;i++){
+      _codeInputControllersToDispose[i].dispose();
+    }
+    _codeInputControllersToDispose.clear();
+    super.dispose();
   }
 
 
@@ -111,11 +161,46 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
             CustomMaterialButton(
               child: const Text("Save",style: TextStyle(color: kBackgroundColor,),),
               buttonColor: kIconColor,
-              onPressed: ()async{
+              onPressed: () async {
+
+                if(_businessNameInputController.text==""){
+                  showDialog(
+                    context: context,
+                    builder: (context)=>YouAlertDialog(
+                      title: const Text("Error",style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600
+                      ),),
+                      backgroundColor: kBackgroundColor,
+                      content: const Text("Business Name cannot be empty"),
+                      actions: [
+                        CustomMaterialButton(
+                          buttonColor: kIconColor,
+                          child: const Text("OK",style: TextStyle(
+                            color: kBackgroundColor
+                          ),),
+                          onPressed: (){
+                            Navigator.pop(context);
+                          },
+                        )
+                      ],
+                    ),
+                  );
+                  return;
+                }
+
+
+                List<List<String>> codes=[];
+                for(int i=0;i<_numRows;i++){
+                  codes.add([]);
+                  for(int j=0;j<_numCols;j++){
+                    codes[i].add(_codeInputControllers[i][j].text);
+                  }
+                }
                 Map<String,dynamic> key={};
-                key['businessName']=_businessName;
+                key['businessName']=_businessNameInputController.text;
                 key['businessIconPath']=_businessIconPath;
-                key['nickname']=_nickname;
+                key['nickname']=_nicknameInputController.text;
                 key['codes']=codes;
                 key['lastModified']=DateTime.now().millisecondsSinceEpoch;
                 try{
@@ -174,9 +259,9 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                         const SizedBox(width: 4,)
                       ],
                     ),
+                    controller: _businessNameInputController,
                     onChanged: (value){
-                      _businessName=value;
-                      String _newBusinessIconPath=AssetMapping.getBusinessIconPath(_businessName);
+                      String _newBusinessIconPath=AssetMapping.getBusinessIconPath(value);
                       if(_businessIconPath!=_newBusinessIconPath){
                         setState(() {
                           _businessIconPath=_newBusinessIconPath;
@@ -190,9 +275,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                   CustomTextField(
                     labelText: "Account nickname",
                     filled: true,
-                    onChanged: (value){
-                      _nickname=value;
-                    },
+                    controller: _nicknameInputController,
                   ),
                   const SizedBox(
                     height: 18,
@@ -261,9 +344,7 @@ class _AddCodeScreenState extends State<AddCodeScreen> {
                               for(int j=0;j<_numCols;j++)
                                 CodeSegmentInput(
                                   isLastField: (i==_numRows-1 && j==_numCols-1),
-                                  onChanged:(value){
-                                    codes[i][j]=value;
-                                  }
+                                  controller: _codeInputControllers[i][j],
                                 ),
                             ],
                           ),

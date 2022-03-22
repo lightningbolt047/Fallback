@@ -1,4 +1,6 @@
+import 'package:animations/animations.dart';
 import 'package:fallback/const.dart';
+import 'package:fallback/screens/add_code_screen.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ import 'material_you/you_alert_dialog.dart';
 class BackupCodeCard extends StatefulWidget {
   final String businessName;
   final String nickname;
-  final List<dynamic> keyList;
+  final List<List<String>> keyList;
   final int lastModified;
   final SecureStorage secureStorage;
   final VoidCallback onSuccess;
@@ -25,7 +27,7 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
 
   final String businessName;
   final String nickname;
-  final List<dynamic> keyList;
+  final List<List<String>> keyList;
   final int lastModified;
   final SecureStorage secureStorage;
   final VoidCallback onSuccess;
@@ -192,16 +194,27 @@ class _BackupCodeCardState extends State<BackupCodeCard> with SingleTickerProvid
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied code to clipboard")));
                   },
                 ),
-                CustomMaterialButton(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.edit),
-                      SizedBox(width: 8,),
-                      Text("Edit code"),
-                    ],
+                OpenContainer(
+                  closedBuilder: (BuildContext context,Function openContainer)=>CustomMaterialButton(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.edit),
+                        SizedBox(width: 8,),
+                        Text("Edit code"),
+                      ],
+                    ),
+                    onPressed: (){
+                      openContainer();
+                    },
                   ),
-                  onPressed: (){},
+                  openBuilder: (BuildContext context,Function closeContainer)=>AddCodeScreen(secureStorage: secureStorage, onSuccess: onSuccess, businessName: businessName, nickname: nickname, codes: keyList,),
+                  useRootNavigator: true,
+                  closedElevation: 0,
+                  closedColor: Colors.transparent,
+                  closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 ),
                 AnimatedSize(
                   duration: const Duration(milliseconds: 250),

@@ -6,9 +6,10 @@ class CustomTextField extends StatelessWidget {
   final String? labelText;
   final bool? filled;
   final Widget? prefix;
-  final Function onChanged;
+  final Function? onChanged;
   final bool obscureText;
-  const CustomTextField({Key? key,this.labelText, this.filled, this.obscureText=false, this.prefix, required this.onChanged}) : super(key: key);
+  final TextEditingController? controller;
+  const CustomTextField({Key? key,this.labelText, this.filled, this.obscureText=false, this.prefix,this.onChanged,this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +36,12 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+      controller: controller,
       obscureText: obscureText,
       onChanged: (value){
-        onChanged(value);
+        if(onChanged!=null){
+          onChanged!(value);
+        }
       },
       textInputAction: TextInputAction.next,
       cursorHeight: 25,
