@@ -103,46 +103,27 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                     ),
                     titleText: getGreeting(),
                     actions: [
-                      CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        child: IconButton(
-                          icon: const Icon(Icons.supervised_user_circle),
-                          color: kIconColor,
-                          onPressed: (){
-                            showDialog(
-                              context: context,
-                              builder: (context)=>YouAlertDialog(
-                                title: const Text("Force Stop?",style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600
-                                ),),
-                                content: const Text("If you force stop an app, it may misbehave",),
-                                backgroundColor: kBackgroundColor,
-                                actions: [
-                                  OutlinedButton(
-                                    onPressed: (){
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text("Cancel",style: TextStyle(color: kIconColor),),
-                                    style: OutlinedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                      side: const BorderSide(color: kIconColor),
-                                      primary: kIconColor,
-                                    ),
-                                  ),
-                                  CustomMaterialButton(
-                                    child: const Text("OK",style: TextStyle(color: kBackgroundColor,),),
-                                    buttonColor: kIconColor,
-                                    onPressed: (){
-
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                      FutureBuilder(
+                        future: secureStorage.readUserProfilePhotoURL(),
+                        builder: (BuildContext context, AsyncSnapshot<String?> snapshot){
+                          if(snapshot.connectionState==ConnectionState.waiting){
+                            return const CircularProgressIndicator(strokeWidth: 2, color: kIconColor,);
+                          }
+                          if(!snapshot.hasData){
+                            return const Icon(Icons.supervised_user_circle, color: kIconColor,);
+                          }
+                          return Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(snapshot.data!)
+                              )
+                            ),
+                          );
+                        },
+                      )
                     ],
                     backgroundColor: Colors.transparent,
                   ),

@@ -71,7 +71,6 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
             },
           ),
           backgroundColor: kBackgroundColor,
-          actions: const [],
         ),
       ),
     );

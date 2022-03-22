@@ -64,12 +64,12 @@ class FirebaseServices{
 
   Future<CloudSyncStatus> _createCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
+    String? userID=await _secureStorage.readUserID();
 
     if(encryptionPassword==null){
       return CloudSyncStatus.encryptionPasswordNotSet;
     }
-    if(userDetails==null || userDetails['userID']==null){
+    if(userID==null){
       return CloudSyncStatus.notSignedIn;
     }
 
@@ -77,7 +77,7 @@ class FirebaseServices{
       Map<String,dynamic> keys=await _secureStorage.readKeys();
       String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
-      await _databaseInstance.collection('userData').doc(userDetails['userID']).set({
+      await _databaseInstance.collection('userData').doc(userID).set({
         "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
         "lastModified": keys['lastModified'],
       });
@@ -91,17 +91,17 @@ class FirebaseServices{
 
   Future<CloudSyncStatus> _restoreCloudBackup() async{
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
+    String? userID=await _secureStorage.readUserID();
 
     if(encryptionPassword==null){
       return CloudSyncStatus.encryptionPasswordNotSet;
     }
-    if(userDetails==null || userDetails['userID']==null){
+    if(userID==null){
       return CloudSyncStatus.notSignedIn;
     }
 
     try{
-      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userDetails['userID']).get();
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
 
       Map<String,dynamic> document=documentSnapshot.data() as Map<String,dynamic>;
       List<String> keyList=[];
@@ -126,13 +126,13 @@ class FirebaseServices{
   Future<CloudSyncType> checkCloudSyncRequired() async{
 
     try{
-      Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
+      String? userID=await _secureStorage.readUserID();
 
-      if(userDetails==null || userDetails['userID']==null){
+      if(userID==null){
         return Future.error("USER_NOT_SIGNED_IN");
       }
 
-      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userDetails['userID']).get();
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
       int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
       int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
 
@@ -151,9 +151,9 @@ class FirebaseServices{
   Future<CloudSyncStatus> performCloudSync(BuildContext context) async{
 
     String? encryptionPassword=await _secureStorage.readEncryptionPassword();
-    Map<String,dynamic>? userDetails=await _secureStorage.readUserDetails();
+    String? userID=await _secureStorage.readUserID();
 
-    if(userDetails==null || userDetails['userID']==null){
+    if(userID==null){
       return CloudSyncStatus.notSignedIn;
     }
     if(encryptionPassword==null){

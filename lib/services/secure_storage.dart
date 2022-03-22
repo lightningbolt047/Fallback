@@ -74,6 +74,30 @@ class SecureStorage{
     }
   }
 
+  Future<String?> readUserProfilePhotoURL() async{
+    try{
+      Map<String,dynamic>? userDetails=await readUserDetails();
+      if(userDetails==null || userDetails['photoURL']==null){
+        return null;
+      }
+      return userDetails['photoURL'];
+    }catch(e){
+      return Future.error(e);
+    }
+  }
+
+  Future<String?> readUserID() async{
+    try{
+      Map<String,dynamic>? userDetails=await readUserDetails();
+      if(userDetails==null || userDetails['userID']==null){
+        return null;
+      }
+      return userDetails['userID'];
+    }catch(e){
+      return Future.error(e);
+    }
+  }
+
   Future<void> writeUserDetails(Map<String,dynamic>? userID) async{
     Map<String,dynamic> cacheDecoded={};
     try{
