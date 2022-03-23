@@ -62,6 +62,10 @@ class SecureStorage{
     }catch(e){
       cacheDecoded['encryptionPassword']=password;
     }finally{
+      cacheDecoded['keys']=await readKeys();
+      if(cacheDecoded['keys']['lastModified']!=0){
+        cacheDecoded['keys']['lastModified']=DateTime.now().millisecondsSinceEpoch;
+      }
       await _writeFullFile(cacheDecoded);
     }
   }

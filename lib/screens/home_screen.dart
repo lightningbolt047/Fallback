@@ -98,8 +98,12 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                 slivers: [
                   CustomSliverAppBar(
                     leading: IconButton(
-                      icon: const Icon(Icons.search_rounded,color: kIconColor,),
-                      onPressed: () {},
+                      tooltip: "Sync",
+                      icon: const Icon(Icons.sync_rounded,),
+                      color: kIconColor,
+                      onPressed: () {
+                        setState(() {});
+                      },
                     ),
                     titleText: getGreeting(),
                     actions: [

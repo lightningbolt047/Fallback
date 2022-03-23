@@ -7,7 +7,6 @@ import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/string_services.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -77,11 +76,19 @@ class FirebaseServices{
       Map<String,dynamic> keys=await _secureStorage.readKeys();
       String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
-      await _databaseInstance.collection('userData').doc(userID).set({
-        "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
-        "lastModified": keys['lastModified'],
-      });
+      DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
 
+      if(documentSnapshot.exists){
+        await _databaseInstance.collection('userData').doc(userID).update({
+          "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
+          "lastModified": keys['lastModified'],
+        });
+      }else{
+        await _databaseInstance.collection('userData').doc(userID).set({
+          "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
+          "lastModified": keys['lastModified'],
+        });
+      }
       return CloudSyncStatus.success;
     }catch(e){
       return CloudSyncStatus.networkError;
@@ -114,7 +121,7 @@ class FirebaseServices{
       }catch(e){
         return CloudSyncStatus.wrongEncryptionPassword;
       }
-      _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
+      await _secureStorage.setAllKeys(jsonDecode(decryptedKeysString));
 
       return CloudSyncStatus.success;
     }catch(e){
@@ -133,7 +140,7 @@ class FirebaseServices{
       }
 
       DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
-      int cloudLastUpdated=documentSnapshot.get('lastModified') as int;
+      int cloudLastUpdated=documentSnapshot.exists?documentSnapshot.get('lastModified') as int:0;
       int localLastUpdated=(await _secureStorage.readKeys())['lastModified'];
 
       if(cloudLastUpdated>localLastUpdated){
@@ -161,73 +168,77 @@ class FirebaseServices{
     }
 
 
-    CloudSyncType cloudSyncStatus=await checkCloudSyncRequired();
-    if(cloudSyncStatus==CloudSyncType.localLatest){
-      return await _createCloudBackup();
-    }else if(cloudSyncStatus==CloudSyncType.cloudLatest){
-      late CloudSyncStatus syncResult;
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context)=>YouAlertDialog(
-          title: const Text("Restore?",style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),),
-          backgroundColor: kBackgroundColor,
-          content: const Text("A newer version of the backup was found online. Restore? If you don't restore now, the data will be overwritten by another backup and can never be retrieved."),
-          actions: [
-            OutlinedButton(
-              onPressed: (){
-                syncResult=CloudSyncStatus.userCancelled;
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel",style: TextStyle(color: kIconColor),),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                side: const BorderSide(color: kIconColor),
-                primary: kIconColor,
+    try{
+      CloudSyncType cloudSyncStatus=await checkCloudSyncRequired();
+      if(cloudSyncStatus==CloudSyncType.localLatest){
+        return await _createCloudBackup();
+      }else if(cloudSyncStatus==CloudSyncType.cloudLatest){
+        late CloudSyncStatus syncResult;
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context)=>YouAlertDialog(
+            title: const Text("Restore?",style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),),
+            backgroundColor: kBackgroundColor,
+            content: const Text("A newer version of the backup was found online. Restore? If you don't restore now, the data will be overwritten by another backup and can never be retrieved."),
+            actions: [
+              OutlinedButton(
+                onPressed: (){
+                  syncResult=CloudSyncStatus.userCancelled;
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancel",style: TextStyle(color: kIconColor),),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  side: const BorderSide(color: kIconColor),
+                  primary: kIconColor,
+                ),
               ),
-            ),
-            CustomMaterialButton(
-              child: const Text("OK",style: TextStyle(
-                color: kBackgroundColor
-              ),),
-              onPressed: () async{
-                syncResult=await _restoreCloudBackup();
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context)=>YouAlertDialog(
-                    title: Text("Restore ${syncResult==CloudSyncStatus.success?"success":"failed"}",style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),),
-                    backgroundColor: kBackgroundColor,
-                    content: Text(syncResult==CloudSyncStatus.success?"Restore successful! Now restart app to continue usage":syncResult==CloudSyncStatus.wrongEncryptionPassword?"Set your old encryption password as your current encryption password and try again":"Failed to restore cloud backup"),
-                    actions: [
-                      if(syncResult!=CloudSyncStatus.success)
-                        CustomMaterialButton(
-                          child: const Text("OK",style: TextStyle(
-                            color: kBackgroundColor,
-                          ),),
-                          buttonColor: kIconColor,
-                          onPressed: (){
-                            Navigator.pop(context);
-                          },
-                        ),
-                    ],
-                  ),
-                );
-              },
-              buttonColor: kIconColor,
-            ),
-          ],
-        ),
-      );
-      return syncResult;
+              CustomMaterialButton(
+                child: const Text("OK",style: TextStyle(
+                    color: kBackgroundColor
+                ),),
+                onPressed: () async{
+                  syncResult=await _restoreCloudBackup();
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context)=>YouAlertDialog(
+                      title: Text("Restore ${syncResult==CloudSyncStatus.success?"success":"failed"}",style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),),
+                      backgroundColor: kBackgroundColor,
+                      content: Text(syncResult==CloudSyncStatus.success?"Restore successful! Now restart app to continue usage":syncResult==CloudSyncStatus.wrongEncryptionPassword?"Set your old encryption password as your current encryption password and try again":"Failed to restore cloud backup"),
+                      actions: [
+                        if(syncResult!=CloudSyncStatus.success)
+                          CustomMaterialButton(
+                            child: const Text("OK",style: TextStyle(
+                              color: kBackgroundColor,
+                            ),),
+                            buttonColor: kIconColor,
+                            onPressed: (){
+                              Navigator.pop(context);
+                            },
+                          ),
+                      ],
+                    ),
+                  );
+                },
+                buttonColor: kIconColor,
+              ),
+            ],
+          ),
+        );
+        return syncResult;
+      }
+      return CloudSyncStatus.success;
+    }catch(e){
+      return CloudSyncStatus.networkError;
     }
-    return CloudSyncStatus.success;
   }
 
 }
