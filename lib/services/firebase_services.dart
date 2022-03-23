@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
@@ -16,10 +17,12 @@ class FirebaseServices{
 
   late final SecureStorage _secureStorage;
   late final FirebaseFirestore _databaseInstance;
+  late final EncryptionService _encryptionService;
 
   FirebaseServices(SecureStorage secureStorage){
     _secureStorage=secureStorage;
     _databaseInstance=FirebaseFirestore.instance;
+    _encryptionService=EncryptionService();
   }
 
   Future<UserCredential> signInWithGoogle() async{
@@ -74,7 +77,7 @@ class FirebaseServices{
 
     try{
       Map<String,dynamic> keys=await _secureStorage.readKeys();
-      String keysEncrypted=await EncryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
+      String keysEncrypted=await _encryptionService.encryptString(jsonEncode(keys), (await _secureStorage.readEncryptionPassword())!);
 
       DocumentSnapshot documentSnapshot=await _databaseInstance.collection('userData').doc(userID).get();
 
@@ -117,7 +120,7 @@ class FirebaseServices{
       }
       late String decryptedKeysString;
       try{
-        decryptedKeysString=await EncryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
+        decryptedKeysString=await _encryptionService.decryptString(StringServices.joinStringFromList(keyList), encryptionPassword);
       }catch(e){
         return CloudSyncStatus.wrongEncryptionPassword;
       }
@@ -165,6 +168,15 @@ class FirebaseServices{
     }
     if(encryptionPassword==null){
       return CloudSyncStatus.encryptionPasswordNotSet;
+    }
+
+    try{
+      List<InternetAddress> addresses=await InternetAddress.lookup("firestore.googleapis.com");
+      if(addresses.isEmpty || addresses[0].rawAddress.isEmpty){
+        return CloudSyncStatus.networkError;
+      }
+    }catch(e){
+      return CloudSyncStatus.networkError;
     }
 
 

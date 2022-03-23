@@ -14,14 +14,17 @@ import '../widgets_basic/input_widgets/custom_text_field.dart';
 
 class LocalBackupService{
   final SecureStorage secureStorage;
-  LocalBackupService(this.secureStorage);
+  late final EncryptionService _encryptionService;
+  LocalBackupService(this.secureStorage){
+    _encryptionService=EncryptionService();
+  }
 
   Future<String> backupAllKeys() async{
     try{
       String directoryPath=(await getExternalStorageDirectory())!.path;
       Map<String,dynamic> keys=await secureStorage.readKeys();
       String keysEncoded=jsonEncode(keys);
-      String encrypted=await EncryptionService.encryptString(keysEncoded, (await secureStorage.readEncryptionPassword())!);
+      String encrypted=await _encryptionService.encryptString(keysEncoded, (await secureStorage.readEncryptionPassword())!);
       String fullFilePath=path.join(directoryPath,"Fallback-backup-${DateTime.now().millisecondsSinceEpoch}.fbcrypt");
       File file=File(fullFilePath);
       await file.writeAsString(encrypted);
@@ -99,56 +102,92 @@ class LocalBackupService{
             buttonColor: kIconColor,
             onPressed: () async{
               BuildContext previousDialogContext=context;
-              try{
-                String decryptedKeys=await EncryptionService.decryptString(encryptedKeys, password);
-                await secureStorage.setAllKeys(jsonDecode(decryptedKeys));
-                showDialog(
-                  context: context,
-                  builder: (context)=>YouAlertDialog(
-                    title: const Text("Backup Restored",style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),),
-                    content: const Text("Backup restored successfully"),
-                    backgroundColor: kBackgroundColor,
-                    actions: [
-                      CustomMaterialButton(
-                        child: const Text("OK",style: TextStyle(
-                          color: kBackgroundColor,
-                        ),),
-                        buttonColor: kIconColor,
-                        onPressed: (){
-                          Navigator.pop(context);
-                          Navigator.pop(previousDialogContext);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              }catch(e){
-                showDialog(
-                  context: context,
-                  builder: (context)=>YouAlertDialog(
-                    title: const Text("Decryption Failed",style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),),
-                    backgroundColor: kBackgroundColor,
-                    content: const Text("Please input the correct password to decrypt the backup. The backup would have been encrypted with a password you had set earlier"),
-                    actions: [
-                      CustomMaterialButton(
-                        child: const Text("OK",style: TextStyle(
-                            color: kBackgroundColor
-                        ),),
-                        buttonColor: kIconColor,
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              }
+              showDialog(
+                context: context,
+                builder: (context)=>FutureBuilder(
+                    future: _encryptionService.decryptString(encryptedKeys, password),
+                    builder: (BuildContext context,AsyncSnapshot<String> snapshot) {
+
+                      if(snapshot.connectionState==ConnectionState.waiting){
+                        return const RestoreProgressDialog();
+                      }
+
+                      if(snapshot.hasError){
+                        return YouAlertDialog(
+                          title: const Text("Decryption Failed",style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),),
+                          backgroundColor: kBackgroundColor,
+                          content: const Text("Please input the correct password to decrypt the backup. The backup would have been encrypted with a password you had set earlier"),
+                          actions: [
+                            CustomMaterialButton(
+                              child: const Text("OK",style: TextStyle(
+                                  color: kBackgroundColor
+                              ),),
+                              buttonColor: kIconColor,
+                              onPressed: (){
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      }
+
+                      return FutureBuilder(
+                          future: secureStorage.setAllKeys(jsonDecode(snapshot.data!)),
+                          builder: (BuildContext context,AsyncSnapshot<void> snapshot) {
+                            if(snapshot.connectionState==ConnectionState.waiting){
+                              return const RestoreProgressDialog();
+                            }
+
+                            if(snapshot.hasError){
+                              return YouAlertDialog(
+                                title: const Text("Restore Failed",style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),),
+                                backgroundColor: kBackgroundColor,
+                                content: const Text("Restore failed for an unknown reason"),
+                                actions: [
+                                  CustomMaterialButton(
+                                    child: const Text("OK",style: TextStyle(
+                                        color: kBackgroundColor
+                                    ),),
+                                    buttonColor: kIconColor,
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            }
+
+                            return YouAlertDialog(
+                              title: const Text("Backup Restored",style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),),
+                              content: const Text("Backup restored successfully"),
+                              backgroundColor: kBackgroundColor,
+                              actions: [
+                                CustomMaterialButton(
+                                  child: const Text("OK",style: TextStyle(
+                                    color: kBackgroundColor,
+                                  ),),
+                                  buttonColor: kIconColor,
+                                  onPressed: (){
+                                    Navigator.pop(context);
+                                    Navigator.pop(previousDialogContext);
+                                  },
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                    }
+                ),
+              );
             },
           ),
         ],
@@ -167,5 +206,26 @@ class LocalBackupService{
       }
     }
   }
+}
 
+class RestoreProgressDialog extends StatelessWidget {
+  const RestoreProgressDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return YouAlertDialog(
+      title: const Text("Restoring Backup",style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),),
+      backgroundColor: kBackgroundColor,
+      content: Row(
+        children: const [
+          CircularProgressIndicator(strokeWidth: 2, color: kIconColor,),
+          SizedBox(width: 12,),
+          Text("Backup restore in progress")
+        ],
+      ),
+    );
+  }
 }

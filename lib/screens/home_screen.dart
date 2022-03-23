@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
 import 'package:fallback/services/firebase_services.dart';
@@ -9,7 +8,6 @@ import 'package:fallback/widgets_basic/backup_code_card.dart';
 import 'package:fallback/widgets_basic/cloud_sync_state_card.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:flutter/material.dart';
-
 import '../widgets_basic/buttons/custom_material_button.dart';
 import '../widgets_basic/custom_app_bar.dart';
 
@@ -116,15 +114,30 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                           if(!snapshot.hasData){
                             return const Icon(Icons.supervised_user_circle, color: kIconColor,);
                           }
-                          return Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage(snapshot.data!)
-                              )
+
+                          return CachedNetworkImage(
+                            imageUrl: snapshot.data!,
+                            imageBuilder: (BuildContext context, ImageProvider imageProvider){
+                              return Container(
+                                height: 32,
+                                width: 32,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                  ),
+                                ),
+                              );
+                            },
+                            progressIndicatorBuilder: (BuildContext context, String string, DownloadProgress downloadProgress)=>Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: downloadProgress.progress,
+                                color: kIconColor,
+                              ),
                             ),
+                            // placeholder: (BuildContext context, String string)=>const Icon(Icons.supervised_user_circle, color: kIconColor,),
+                            errorWidget: (BuildContext context, String string, dynamic error)=>const Icon(Icons.supervised_user_circle, color: kIconColor,),
                           );
                         },
                       )
@@ -153,6 +166,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                 fontWeight: FontWeight.w600,
                                 fontSize: 18,
                               ),),
+                              subtitle: Text("You can continue using the app offline"),
                             );
                           }else if(snapshot.data==CloudSyncStatus.notSignedIn){
                             return CloudSyncStateCard(

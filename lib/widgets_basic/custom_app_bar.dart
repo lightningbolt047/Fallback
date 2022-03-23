@@ -16,7 +16,7 @@ class CustomSliverAppBar extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 50,
       leading: leading,
-      leadingWidth: 24,
+      leadingWidth: 36,
       bottom: PreferredSize(
         preferredSize: const Size(30,30),
         child: Align(alignment:Alignment.centerLeft,child: ScreenHeaderText(text: titleText)),
