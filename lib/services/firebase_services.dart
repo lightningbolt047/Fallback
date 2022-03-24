@@ -7,6 +7,7 @@ import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/string_services.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
+import 'package:fallback/widgets_basic/compound/restore_progress_dialog.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -185,7 +186,7 @@ class FirebaseServices{
       if(cloudSyncStatus==CloudSyncType.localLatest){
         return await _createCloudBackup();
       }else if(cloudSyncStatus==CloudSyncType.cloudLatest){
-        late CloudSyncStatus syncResult;
+        CloudSyncStatus? syncResult;
         await showDialog(
           context: context,
           barrierDismissible: false,
@@ -214,29 +215,38 @@ class FirebaseServices{
                     color: kBackgroundColor
                 ),),
                 onPressed: () async{
-                  syncResult=await _restoreCloudBackup();
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder: (context)=>YouAlertDialog(
-                      title: Text("Restore ${syncResult==CloudSyncStatus.success?"success":"failed"}",style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),),
-                      backgroundColor: kBackgroundColor,
-                      content: Text(syncResult==CloudSyncStatus.success?"Restore successful! Now restart app to continue usage":syncResult==CloudSyncStatus.wrongEncryptionPassword?"Set your old encryption password as your current encryption password and try again":"Failed to restore cloud backup"),
-                      actions: [
-                        if(syncResult!=CloudSyncStatus.success)
-                          CustomMaterialButton(
-                            child: const Text("OK",style: TextStyle(
-                              color: kBackgroundColor,
-                            ),),
-                            buttonColor: kIconColor,
-                            onPressed: (){
-                              Navigator.pop(context);
-                            },
-                          ),
-                      ],
+                    builder: (context)=>FutureBuilder(
+                      future: _restoreCloudBackup(),
+                      builder: (BuildContext context, AsyncSnapshot<CloudSyncStatus> snapshot) {
+                        if(snapshot.connectionState==ConnectionState.waiting){
+                          return const RestoreProgressDialog();
+                        }
+                        syncResult=snapshot.data;
+
+                        return YouAlertDialog(
+                          title: Text("Restore ${syncResult==CloudSyncStatus.success?"success":"failed"}",style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),),
+                          backgroundColor: kBackgroundColor,
+                          content: Text(syncResult==CloudSyncStatus.success?"Restore successful! Now restart app to continue usage":syncResult==CloudSyncStatus.wrongEncryptionPassword?"Set your old encryption password as your current encryption password and try again":"Failed to restore cloud backup"),
+                          actions: [
+                            if(syncResult!=CloudSyncStatus.success)
+                              CustomMaterialButton(
+                                child: const Text("OK",style: TextStyle(
+                                  color: kBackgroundColor,
+                                ),),
+                                buttonColor: kIconColor,
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                },
+                              ),
+                          ],
+                        );
+                      }
                     ),
                   );
                 },
@@ -245,7 +255,7 @@ class FirebaseServices{
             ],
           ),
         );
-        return syncResult;
+        return syncResult??CloudSyncStatus.networkError;
       }
       return CloudSyncStatus.success;
     }catch(e){

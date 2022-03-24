@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../widgets_basic/compound/restore_progress_dialog.dart';
 import '../widgets_basic/input_widgets/custom_text_field.dart';
 
 class LocalBackupService{
@@ -205,27 +206,5 @@ class LocalBackupService{
         }
       }
     }
-  }
-}
-
-class RestoreProgressDialog extends StatelessWidget {
-  const RestoreProgressDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return YouAlertDialog(
-      title: const Text("Restoring Backup",style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),),
-      backgroundColor: kBackgroundColor,
-      content: Row(
-        children: const [
-          CircularProgressIndicator(strokeWidth: 2, color: kIconColor,),
-          SizedBox(width: 12,),
-          Text("Backup restore in progress")
-        ],
-      ),
-    );
   }
 }
