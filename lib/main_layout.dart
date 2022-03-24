@@ -5,6 +5,8 @@ import 'package:fallback/screens/home_screen.dart';
 import 'package:fallback/screens/settings_screen.dart';
 import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/secure_storage.dart';
+import 'package:fallback/services/shared_prefs.dart';
+import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/material_you/you_bottom_app_bar_button.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -76,9 +78,42 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
     );
   }
 
+  void informExistingUsers() async{
+
+    final bool? oldUser=await getSetupCompletedPreference();
+
+    if(!oldUser!){
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context)=>YouAlertDialog(
+          title: const Text("Important Info",style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),),
+          content: const Text("If you are an existing user and want to restore backup from the cloud, please DO NOT add or delete keys. Sign In to your account, set your old password as your encryption password, visit the app's home screen and wait for a prompt to restore."),
+          actions: [
+            CustomMaterialButton(
+              child: const Text("OK",style: TextStyle(
+              color: kBackgroundColor,
+              ),),
+              buttonColor: kIconColor,
+              onPressed: (){
+                setSetupCompletedPreference(true);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+  }
+
 
   @override
   void initState() {
+    informExistingUsers();
     biometricAvailabilityCheck();
     super.initState();
   }

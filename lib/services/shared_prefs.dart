@@ -13,3 +13,17 @@ Future<bool?> getEnableCloudSyncPreference() async{
   }
   return pref.getBool("cloudSync");
 }
+
+Future<void> setSetupCompletedPreference(bool value) async{
+  SharedPreferences pref=await SharedPreferences.getInstance();
+  pref.setBool("setupComplete", value);
+}
+
+Future<bool?> getSetupCompletedPreference() async{
+  SharedPreferences pref=await SharedPreferences.getInstance();
+  if(pref.getBool("setupComplete")==null){
+    pref.setBool("setupComplete", false);
+    return false;
+  }
+  return pref.getBool("setupComplete");
+}

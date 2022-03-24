@@ -1,5 +1,7 @@
 import 'package:fallback/const.dart';
 import 'package:fallback/main_layout.dart';
+import 'package:fallback/screens/setup_screen.dart';
+import 'package:fallback/services/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -52,7 +54,23 @@ class MyApp extends StatelessWidget {
           button: GoogleFonts.quicksand(),
         )
       ),
-      home: MainLayout(),
+      home: FutureBuilder(
+        future: getSetupCompletedPreference(),
+        builder: (BuildContext context, AsyncSnapshot<bool?> snapshot){
+          if(snapshot.connectionState==ConnectionState.waiting){
+            return const Scaffold(
+              backgroundColor: kBackgroundColor,
+              body: Center(child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),),
+            );
+          }
+          if(snapshot.data!){
+            return const MainLayout();
+          }else{
+            return const SetupScreen();
+          }
+        },
+      ),
+      // home: MainLayout(),
     );
   }
 }
