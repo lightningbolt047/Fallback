@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class YouListTile extends StatelessWidget {
 
   final String titleText;
-  final String subtitleText;
+  final String? subtitleText;
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
   final bool enabled;
   final bool leaveBottomSpace;
 
-  const YouListTile({Key? key, required this.titleText, required this.subtitleText, this.leading, this.trailing, this.leaveBottomSpace=true, this.onTap, this.enabled=true}) : super(key: key);
+  const YouListTile({Key? key, required this.titleText, this.subtitleText, this.leading, this.trailing, this.leaveBottomSpace=true, this.onTap, this.enabled=true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class YouListTile extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
-          subtitle: Text(subtitleText),
+          subtitle: subtitleText==null?null:Text(subtitleText!),
           leading: leading,
           onTap: onTap,
         ),

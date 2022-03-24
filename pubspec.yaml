@@ -47,6 +47,7 @@ dependencies:
   firebase_auth: ^3.3.11
   cloud_firestore: ^3.1.10
   cached_network_image: ^3.2.0
+  package_info_plus: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/business_icons/
+    - assets/fallback_squircle_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

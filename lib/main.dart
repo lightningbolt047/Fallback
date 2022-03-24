@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -18,6 +21,21 @@ class MyApp extends StatelessWidget {
       // showPerformanceOverlay: true,
       theme: ThemeData(
         useMaterial3: true,
+        backgroundColor: kBackgroundColor,
+        cardColor: kBackgroundColor,
+        dialogBackgroundColor: kBackgroundColor,
+        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: kIconColor),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: kIconColor,
+        ),
+        appBarTheme: const AppBarTheme(
+          color: kIconColor
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.all(kIconColor)
+          ),
+        ),
         toggleableActiveColor: kIconColor,
         textTheme: TextTheme(
           headline1: GoogleFonts.quicksand(),
