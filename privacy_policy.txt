@@ -1,0 +1,8 @@
+-----Privacy Policy-----
+
+There is no action to explicitly collect and store user data other than the keys that the user inputs in this app.
+
+This app stores all of your keys offline if you choose not to enable the "Cloud Sync" feature.
+Even if you enable the "Cloud Sync", your keys will never be synced and stored as plain text. They can be synced only if you set the encryption password and the encryption succeeds. Moreover the data can be retrieved only if the user enters the same password again and the decryption succeeds.
+Latest versions of keys are identified by comparing the lastModified time. So, this is an additional data that is stored online other than the encrypted keys.
+Users are uniquely identified in the cloud based on their user id (obtained from their Google Login). This is done to separate a user's sync data from others.
