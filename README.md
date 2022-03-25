@@ -22,8 +22,8 @@
 </div>
 
 <div>
-    <img src="readme_assets/store_securely.png" alt="store_securely" width="304" height="608"/>
-    <img src="readme_assets/cloud_sync.png" alt="store_securely" width="304" height="608"/>
-    <img src="readme_assets/local_backups.png" alt="store_securely" width="304" height="608"/>
+    <img src="readme_assets/store_securely.png" alt="store_securely" width="253.333" height="506.666"/>
+    <img src="readme_assets/cloud_sync.png" alt="store_securely" width="253.333" height="506.666"/>
+    <img src="readme_assets/local_backups.png" alt="store_securely" width="253.333" height="506.666"/>
 </div>
 
