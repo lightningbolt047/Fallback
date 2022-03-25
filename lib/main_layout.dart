@@ -11,7 +11,10 @@ import 'package:fallback/widgets_basic/material_you/you_bottom_app_bar_button.da
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:screen_protector/lifecycle/lifecycle_state.dart';
+import 'package:screen_protector/screen_protector.dart';
 import 'enums.dart';
+import 'dart:io';
 import 'const.dart';
 
 class MainLayout extends StatefulWidget {
@@ -21,7 +24,7 @@ class MainLayout extends StatefulWidget {
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateMixin {
+class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProviderStateMixin {
 
   Screen _selectedScreen=Screen.home;
 
@@ -113,9 +116,37 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
 
   @override
   void initState() {
+    if(Platform.isIOS){
+      ScreenProtector.protectDataLeakageWithBlur();
+    }
     informExistingUsers();
     biometricAvailabilityCheck();
     super.initState();
+  }
+
+  @override
+  void onPaused() {
+    if(Platform.isAndroid){
+      ScreenProtector.protectDataLeakageOff();
+    }
+    super.onPaused();
+  }
+
+  @override
+  void onResumed() {
+    if(Platform.isAndroid){
+      ScreenProtector.protectDataLeakageOn();
+    }
+    super.onResumed();
+  }
+
+
+  @override
+  void dispose() {
+    if(Platform.isIOS){
+      ScreenProtector.preventScreenshotOff();
+    }
+    super.dispose();
   }
 
 
