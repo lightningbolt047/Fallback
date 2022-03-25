@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:isolate';
-
 import 'package:aes256gcm/aes256gcm.dart';
 
 class EncryptionService{

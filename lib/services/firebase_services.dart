@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
 import 'package:fallback/services/encryption_service.dart';

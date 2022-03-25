@@ -1,5 +1,3 @@
-
-
 String getGreeting(){
   DateTime now = DateTime.now();
   if(now.hour<12){

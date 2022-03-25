@@ -118,6 +118,8 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
   void initState() {
     if(Platform.isIOS){
       ScreenProtector.protectDataLeakageWithBlur();
+    }else if(Platform.isAndroid){
+      ScreenProtector.protectDataLeakageOn();
     }
     informExistingUsers();
     biometricAvailabilityCheck();

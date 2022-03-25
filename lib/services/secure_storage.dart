@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:biometric_storage/biometric_storage.dart';
 
 class SecureStorage{

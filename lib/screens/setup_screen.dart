@@ -1,7 +1,6 @@
 import 'package:fallback/const.dart';
 import 'package:fallback/main_layout.dart';
 import 'package:fallback/services/legal.dart';
-import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
