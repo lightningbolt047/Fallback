@@ -7,7 +7,7 @@ Downloads from GitHub Releases: ![Downloads](https://img.shields.io/github/downl
 
 <div>
     <h2>About</h2>
-    <p>An application you "Fallback" to when you don't have access to your 2FA codes. Fallback is built using Flutter and follows Material Design 3. The Android app is now available on Google Play Store.</p>
+    <p>An application you "Fallback" to when you don't have access to your 2FA codes. Fallback is built using Flutter and follows Material Design 3. The Android app is now available on <a href="https://play.google.com/store/apps/details?id=com.lightning.fallback">Google Play Store</a>.</p>
 </div>
 
 <div>
@@ -31,7 +31,7 @@ Downloads from GitHub Releases: ![Downloads](https://img.shields.io/github/downl
             Android 10+
         </li>
         <li>
-            Biometric authentication of some sort (Mostly Fingerprint since most Face Unlock implementations are incompatible with this app). 
+            Biometric authentication of some sort (Mostly Fingerprint on Android since most Face Unlock implementations are not supported by this app). 
         </li>
         <li>
             GMS (Google Mobile Services) if you want to use Cloud Sync.
@@ -43,7 +43,7 @@ Downloads from GitHub Releases: ![Downloads](https://img.shields.io/github/downl
     <h2>How do I download?</h2>
     <p>The app can be downloaded in two ways:</p>
     <ul>
-        <li>Google Play Store: The easiest method, search for "Fallback" and install the app from there.</li>
+        <li>Google Play Store: <a href="https://play.google.com/store/apps/details?id=com.lightning.fallback">Download</a>.</li>
         <li>Github Releases: For those who cannot or do not want to install from the Google Play Store can download the apk from this repo's releases. Do note that OTA updates do not work if the app is installed through this method and the user has to manually update the app.</li>
     </ul>
 </div>
