@@ -221,22 +221,22 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate((BuildContext context, int index){
-                      List<List<String>> codesString=[];
-                      for(int i=0;i<snapshot.data!['businesses'][index]['codes'].length;i++){
-                        codesString.add([]);
-                        for(int j=0;j<snapshot.data!['businesses'][index]['codes'][i].length;j++){
-                          codesString[i].add(snapshot.data!['businesses'][index]['codes'][i][j]);
+                        List<List<String>> codesString=[];
+                        for(int i=0;i<snapshot.data!['businesses'][index]['codes'].length;i++){
+                          codesString.add([]);
+                          for(int j=0;j<snapshot.data!['businesses'][index]['codes'][i].length;j++){
+                            codesString[i].add(snapshot.data!['businesses'][index]['codes'][i][j]);
+                          }
                         }
-                      }
 
-                      return BackupCodeCard(
-                          businessName: snapshot.data!['businesses'][index]['businessName'],
-                          nickname: snapshot.data!['businesses'][index]['nickname'],
-                          keyList: codesString,
-                          lastModified: snapshot.data!['businesses'][index]['lastModified'],
-                          secureStorage: secureStorage,
-                          onSuccess: fetchKeys
-                      );
+                        return BackupCodeCard(
+                            businessName: snapshot.data!['businesses'][index]['businessName'],
+                            nickname: snapshot.data!['businesses'][index]['nickname'],
+                            keyList: codesString,
+                            lastModified: snapshot.data!['businesses'][index]['lastModified'],
+                            secureStorage: secureStorage,
+                            onSuccess: fetchKeys
+                        );
                       },
                       childCount: snapshot.data!['businesses'].length
 

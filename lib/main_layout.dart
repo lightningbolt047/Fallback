@@ -233,7 +233,7 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
                   fontSize: 20,
                   fontWeight: FontWeight.w600
                 ),),
-                content: Text("Something went wrong! Couldn't initialize firebase."),
+                content: Text("Something went wrong! Probably couldn't find google play on your device"),
               ),
             );
             return const Center(
