@@ -169,9 +169,11 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
                 text: "Home",
                 isSelected: _selectedScreen==Screen.home,
                 onPressed: (){
-                  setState(() {
-                    _selectedScreen=Screen.home;
-                  });
+                  if(_selectedScreen!=Screen.home){
+                    setState(() {
+                      _selectedScreen=Screen.home;
+                    });
+                  }
                 },
               ),
               YouBottomAppBarButton(
@@ -179,9 +181,11 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
                 text: "Settings",
                 isSelected: _selectedScreen==Screen.settings,
                 onPressed: (){
-                  setState(() {
-                    _selectedScreen=Screen.settings;
-                  });
+                  if(_selectedScreen!=Screen.settings){
+                    setState(() {
+                      _selectedScreen=Screen.settings;
+                    });
+                  }
                 },
               ),
             ],

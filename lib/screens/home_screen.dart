@@ -144,6 +144,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                     ],
                     backgroundColor: Colors.transparent,
                   ),
+
                   SliverToBoxAdapter(
                     child: AnimatedSize(
                       duration: const Duration(milliseconds:250),
@@ -210,6 +211,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                 fontWeight: FontWeight.w600,
                                 fontSize: 20,
                               ),),
+                              subtitle: Text("Required for backups"),
                             );
                           }
                           return Container(
@@ -219,6 +221,93 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                       ),
                     ),
                   ),
+                  if(snapshot.data!['businesses'].length==0)
+                    SliverFillRemaining(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            children: [
+                              Card(
+                                color: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: kIconColor)
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            height: 35,
+                                            width: 35,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: kIconColor.withOpacity(0.25),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 6,
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  color: kIconColor.withOpacity(0.25)
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          for(int i=0;i<4;i++)
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(25),
+                                                  color: kIconColor.withOpacity(0.25)
+                                              ),
+                                              child: const Padding(
+                                                padding: EdgeInsets.symmetric(vertical: 4.0,horizontal: 24),
+                                                child: Icon(Icons.key_rounded,color: kBackgroundColor,),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: kIconColor,
+                                  ),
+                                  child: const Icon(Icons.add,color: kBackgroundColor,),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text("Add an account to get started",style: TextStyle(
+                              color: kIconColor.withOpacity(0.5),
+                              fontSize: 18
+                          ),)
+                        ],
+                      ),
+                    ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate((BuildContext context, int index){
                         List<List<String>> codesString=[];

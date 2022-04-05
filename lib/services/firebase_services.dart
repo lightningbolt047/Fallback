@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class FirebaseServices{
 
@@ -85,11 +86,13 @@ class FirebaseServices{
         await _databaseInstance.collection('userData').doc(userID).update({
           "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
           "lastModified": keys['lastModified'],
+          "version":(await PackageInfo.fromPlatform()).version
         });
       }else{
         await _databaseInstance.collection('userData').doc(userID).set({
           "keys" : StringServices.splitStringToList(keysEncrypted, backupStringLengthQuanta),
           "lastModified": keys['lastModified'],
+          "version":(await PackageInfo.fromPlatform()).version
         });
       }
       return CloudSyncStatus.success;

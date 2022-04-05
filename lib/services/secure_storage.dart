@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:biometric_storage/biometric_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SecureStorage{
 
@@ -21,7 +22,6 @@ class SecureStorage{
   }
 
   Future<Map<String,dynamic>> _readFullFile() async{
-
     if(_storage!=null && (jsonDecode(_storage!)['keys']!=null || jsonDecode(_storage!)['encryptionPassword']!=null)){
       return jsonDecode(_storage!);
     }
@@ -37,6 +37,7 @@ class SecureStorage{
 
   Future<void> _writeFullFile(Map<String,dynamic> map) async{
     try{
+      map['keys']['version']=(await PackageInfo.fromPlatform()).version;
       String fullDataEncoded=jsonEncode(map);
       await _keyStore.write(fullDataEncoded);
       _storage=fullDataEncoded;
@@ -155,116 +156,4 @@ class SecureStorage{
     cacheDecoded['keys']['lastModified']=DateTime.now().millisecondsSinceEpoch;
     await _writeFullFile(cacheDecoded);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Future<void> writeToStorage(Map<String,dynamic> map) async{
-  //   try{
-  //     String encoded=jsonEncode(map);
-  //     await _keyStore.write(encoded);
-  //     _storage=jsonEncode(encoded);
-  //   }on AuthException{
-  //     await writeToStorage(map);
-  //   }
-  // }
-  //
-  // Future<Map<String,dynamic>> readFromStorage() async{
-  //   dynamic decodedStorage=jsonDecode(_storage!);
-  //   if(_storage!=null && (jsonDecode(_storage!)['keyDetails']!=null || jsonDecode(_storage!)['encryptionPassword']!=null)){
-  //     return jsonDecode(_storage!);
-  //   }
-  //
-  //   try{
-  //     _storage=await _keyStore.read();
-  //     if(_storage==null){
-  //       throw Exception("Empty");
-  //     }
-  //     return jsonDecode(_storage!);
-  //   }on AuthException{
-  //     return await readFromStorage();
-  //   }
-  // }
-  //
-  // Future<Map<String,dynamic>> readKeys() async{
-  //   try{
-  //     return (await readFromStorage())['keyDetails'];
-  //   }catch(e,stackTrace){
-  //     print(stackTrace);
-  //     return Future.error(e.toString());
-  //   }
-  // }
-  //
-  // Future<Map<String,String>> readEncryptionPassword() async{
-  //   try{
-  //     return (await readFromStorage())['encryptionPassword'];
-  //   }catch(e){
-  //     return Future.error(e.toString());
-  //   }
-  // }
-  //
-  // Future<void> writeKeys(dynamic keys) async{
-  //   if(_storage==null){
-  //     Map<String,dynamic> keysToStore={};
-  //     keysToStore['keyDetails']={};
-  //     keysToStore['keyDetails']['keys']=keys;
-  //     DateTime now=DateTime.now();
-  //     keysToStore['keyDetails']['lastModified']=now.millisecondsSinceEpoch;
-  //     await writeToStorage(keysToStore);
-  //   }else{
-  //     Map<String,dynamic> decoded=jsonDecode(_storage!);
-  //     decoded['keyDetails']['keys']=keys;
-  //     decoded['keyDetails']['lastModified']=DateTime.now().millisecondsSinceEpoch;
-  //     await writeToStorage(decoded);
-  //   }
-  // }
-  //
-  // Future<void> addKey(Map<String,dynamic> key) async{
-  //   Map<String,dynamic> keyDetails={'keys':[]};
-  //   try{
-  //     keyDetails=await readKeys();
-  //     keyDetails['keys'].add(key);
-  //   }catch(e){
-  //     keyDetails['keys'].add(key);
-  //   }finally{
-  //     await writeKeys(keyDetails['keys']);
-  //   }
-  // }
-  //
-  // Future<void> writeEncryptionPassword(String password) async{
-  //   if(_storage==null){
-  //     Map<String,dynamic> storage={};
-  //     storage['encryptionPassword']=password;
-  //     await writeToStorage(storage);
-  //   }else{
-  //     Map<String,dynamic> decoded=jsonDecode(_storage!);
-  //     decoded['encryptionPassword']=password;
-  //     await writeToStorage(decoded);
-  //   }
-  // }
-
 }
