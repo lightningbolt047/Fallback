@@ -233,7 +233,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                 shadowColor: Colors.transparent,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
-                                    side: const BorderSide(color: kIconColor)
+                                    side: BorderSide(color: kIconColor.withOpacity(0.5))
                                 ),
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
@@ -294,7 +294,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                   height: 50,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: kIconColor,
+                                    color: Color(0xFFacac94),
                                   ),
                                   child: const Icon(Icons.add,color: kBackgroundColor,),
                                 ),
