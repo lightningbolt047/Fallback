@@ -17,18 +17,20 @@ import '../widgets_basic/material_you/you_list_tile.dart';
 class SettingsScreen extends StatefulWidget {
   final SecureStorage secureStorage;
   final FirebaseServices firebaseServices;
-  const SettingsScreen({Key? key,required this.secureStorage,required this.firebaseServices}) : super(key: key);
+  final Function changeScreen;
+  const SettingsScreen({Key? key,required this.secureStorage,required this.firebaseServices, required this.changeScreen}) : super(key: key);
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState(secureStorage,firebaseServices);
+  State<SettingsScreen> createState() => _SettingsScreenState(secureStorage,firebaseServices,changeScreen);
 }
 
 class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
 
   final SecureStorage secureStorage;
   final FirebaseServices firebaseServices;
+  final Function changeScreen;
 
-  _SettingsScreenState(this.secureStorage,this.firebaseServices);
+  _SettingsScreenState(this.secureStorage,this.firebaseServices,this.changeScreen);
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -388,7 +390,7 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                 SliverToBoxAdapter(
                   child: YouListTile(
                     titleText: "Clear all Backup Files",
-                    subtitleText: "This will delete all stored backups in the backup directory. Backups you have stored separately will still work",
+                    subtitleText: "This will delete all stored local backups in the backup directory. Backups you have stored separately will still work",
                     leading: const Icon(Icons.delete_forever_rounded, color: Colors.red,),
                     onTap: (){
                       showDialog(
@@ -422,6 +424,84 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                         ),
                       );
                     },
+                  ),
+                ),
+                const SliverToBoxAdapter(
+                  child: PageSubheading(subheadingName: "Privacy"),
+                ),
+                SliverToBoxAdapter(
+                  child: FutureBuilder(
+                    future: getEnableCloudSyncPreference(),
+                    builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+                      if(snapshot.connectionState==ConnectionState.waiting){
+                        return const LinearProgressIndicator(
+                          color: kIconColor,
+                        );
+                      }
+                      return YouListTile(
+                        titleText: "Delete all Cloud Sync content",
+                        subtitleText: "This will remove all of your content from the cloud storage and log you out. Deleted data cannot be recovered",
+                        enabled: snapshot.data!,
+                        leading: const Icon(Icons.cloud_off_rounded, color: Colors.red,),
+                        onTap: (){
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context)=>FutureBuilder(
+                              future: firebaseServices.deleteUserData(),
+                              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                                if(snapshot.connectionState==ConnectionState.waiting){
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: kBackgroundColor,
+                                    ),
+                                  );
+                                }
+
+                                if(snapshot.hasError){
+                                  return YouAlertDialog(
+                                    title: const Text("Error",style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),),
+                                    content: const Text("An unknown error has occurred"),
+                                    actions: [
+                                      CustomMaterialButton(
+                                        buttonColor: kIconColor,
+                                        child: const Text("OK",style: TextStyle(color: kBackgroundColor),),
+                                        onPressed: (){
+                                          Navigator.pop(context);
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
+
+                                return YouAlertDialog(
+                                  title: const Text("Deleted Successfully",style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),),
+                                  content: const Text("Your data was deleted successfully and you have been logged out"),
+                                  actions: [
+                                    CustomMaterialButton(
+                                      buttonColor:kIconColor,
+                                      child: const Text("OK",style: TextStyle(color: kBackgroundColor),),
+                                      onPressed: (){
+                                        Navigator.pop(context);
+                                        changeScreen();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }
+                            ),
+                          );
+                        },
+                      );
+                    }
                   ),
                 ),
                 const SliverToBoxAdapter(

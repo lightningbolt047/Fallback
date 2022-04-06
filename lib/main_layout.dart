@@ -263,7 +263,11 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
               final FirebaseServices firebaseServices=FirebaseServices(snapshot.data!);
 
               if(_selectedScreen==Screen.settings){
-                return SettingsScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices,);
+                return SettingsScreen(secureStorage: snapshot.data!, firebaseServices: firebaseServices, changeScreen: (){
+                  setState(() {
+                    _selectedScreen=Screen.home;
+                  });
+                },);
               }
               return HomeScreen(key:_homeScreenKey, secureStorage: snapshot.data!, firebaseServices: firebaseServices);
             },

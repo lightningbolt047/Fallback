@@ -4,6 +4,7 @@ import 'package:fallback/const.dart';
 import 'package:fallback/enums.dart';
 import 'package:fallback/services/encryption_service.dart';
 import 'package:fallback/services/secure_storage.dart';
+import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/services/string_services.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
 import 'package:fallback/widgets_basic/compound/restore_progress_dialog.dart';
@@ -262,6 +263,17 @@ class FirebaseServices{
       return CloudSyncStatus.success;
     }catch(e){
       return CloudSyncStatus.networkError;
+    }
+  }
+
+  Future<void> deleteUserData() async{
+    try{
+      String? userID=await _secureStorage.readUserID();
+      await signOutOfGoogle();
+      await setEnableCloudSyncPreference(false);
+      await _databaseInstance.collection('userData').doc(userID).delete();
+    }catch(e){
+      return Future.error(e);
     }
   }
 
