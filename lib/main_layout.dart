@@ -110,7 +110,14 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
         ),
       );
     }
+  }
 
+  Future<FirebaseApp> initializeFirebaseApp() async{
+    try{
+      return Firebase.initializeApp();
+    }catch(e){
+      return Future.error(e);
+    }
   }
 
 
@@ -225,32 +232,13 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
         ),
       ),
       body: FutureBuilder(
-        future: Firebase.initializeApp(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-
-          if(snapshot.hasError){
-            showDialog(
-              context: context,
-              builder: (context)=>const YouAlertDialog(
-                backgroundColor: kBackgroundColor,
-                title: Text("Error",style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600
-                ),),
-                content: Text("Something went wrong! Probably couldn't find google play on your device"),
-              ),
-            );
-            return const Center(
-              child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),
-            );
-          }
-
+        future: initializeFirebaseApp(),
+        builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
           if(snapshot.connectionState==ConnectionState.waiting){
             return const Center(
               child: CircularProgressIndicator(strokeWidth: 2,color: kIconColor,),
             );
           }
-
           return FutureBuilder(
             future: _secureStorage,
             builder: (BuildContext context,AsyncSnapshot<SecureStorage> snapshot){

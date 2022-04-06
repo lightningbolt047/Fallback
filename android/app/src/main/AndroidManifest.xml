@@ -8,7 +8,7 @@
 <!--    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
    <application
         android:hasFragileUserData="true"
-        android:label="fallback"
+        android:label="Fallback"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

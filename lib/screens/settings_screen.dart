@@ -125,9 +125,11 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                             content: Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: const [
                                     Icon(Icons.warning_rounded,color: Colors.red,),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
                                     Text("Password cannot be recovered if lost",maxLines: 5,),
                                   ],
                                 ),
