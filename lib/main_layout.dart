@@ -7,7 +7,6 @@ import 'package:fallback/services/firebase_services.dart';
 import 'package:fallback/services/secure_storage.dart';
 import 'package:fallback/services/shared_prefs.dart';
 import 'package:fallback/widgets_basic/buttons/custom_material_button.dart';
-import 'package:fallback/widgets_basic/material_you/you_bottom_app_bar_button.dart';
 import 'package:fallback/widgets_basic/material_you/you_alert_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +36,7 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
     _secureStorage=SecureStorage.getInstance();
 
     CanAuthenticateResponse availability=await (await _secureStorage).getBiometricStatus();
+
     if(availability==CanAuthenticateResponse.success){
       return;
     }
@@ -165,39 +165,40 @@ class _MainLayoutState extends LifecycleState<MainLayout> with SingleTickerProvi
     return Scaffold(
       backgroundColor: kBackgroundColor,
       bottomNavigationBar: BottomAppBar(
-        child: Container(
-          color: kBackgroundColor,
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              YouBottomAppBarButton(
-                iconData: Icons.home,
-                text: "Home",
-                isSelected: _selectedScreen==Screen.home,
-                onPressed: (){
-                  if(_selectedScreen!=Screen.home){
-                    setState(() {
-                      _selectedScreen=Screen.home;
-                    });
-                  }
-                },
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            backgroundColor: kBackgroundColor,
+            indicatorColor: kIconColor,
+            labelTextStyle: MaterialStateProperty.all(const TextStyle(
+              color: kIconColor,
+            ),),
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            height: 65,
+          ),
+          child: NavigationBar(
+            onDestinationSelected: (index){
+              if(_selectedScreen!=Screen.values[index]){
+                setState(() {
+                  _selectedScreen=Screen.values[index];
+                });
+              }
+            },
+            selectedIndex: _selectedScreen.index,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home,color: kIconColor,),
+                selectedIcon: Icon(Icons.home,color: kBackgroundColor,),
+                label: "Home",
               ),
-              YouBottomAppBarButton(
-                iconData: Icons.settings,
-                text: "Settings",
-                isSelected: _selectedScreen==Screen.settings,
-                onPressed: (){
-                  if(_selectedScreen!=Screen.settings){
-                    setState(() {
-                      _selectedScreen=Screen.settings;
-                    });
-                  }
-                },
+              NavigationDestination(
+                icon: Icon(Icons.settings,color: kIconColor,),
+                selectedIcon: Icon(Icons.settings,color: kBackgroundColor,),
+                label: "Settings",
               ),
             ],
+
           ),
-        ),
+        )
       ),
       floatingActionButton: AnimatedScale(
         duration: const Duration(milliseconds: 250),
