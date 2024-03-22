@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         backgroundColor: kBackgroundColor,
         cardColor: kBackgroundColor,
         dialogBackgroundColor: kBackgroundColor,
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: kIconColor),
+        colorScheme: ColorScheme.fromSeed(seedColor: kIconColor),
         progressIndicatorTheme: const ProgressIndicatorThemeData(
           color: kIconColor,
         ),

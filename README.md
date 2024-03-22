@@ -21,6 +21,7 @@ Downloads from GitHub Releases: ![Downloads](https://img.shields.io/github/downl
         <li>Cloud Sync: Keys can be synced to the project's firestore and can be retrieved by the user anytime (even across devices)</li>
         <li>Local Backups: Users who don't want to or can't use Cloud Sync can also make backups and restore their keys.</li>
         <li>Fully Encrypted: Keys are fully encrypted at all times. Keys are encrypted using the password that the user sets which is then synced to the cloud or stored as a local backup. Users cannot use cloud sync or make local backups without setting their encryption password.</li>
+        <li>Data Deletion: You can delete all cloud synced data by disconnecting your account from the setting page</li>
     </ul>
 </div>
 
